@@ -15,6 +15,7 @@ import { ListMembersUseCase } from '../application/use-cases/list-members.use-ca
 import { UpdateMemberRoleUseCase } from '../application/use-cases/update-member-role.use-case';
 import { RemoveMemberUseCase } from '../application/use-cases/remove-member.use-case';
 import { LeaveWorkspaceUseCase } from '../application/use-cases/leave-workspace.use-case';
+import { getUser } from '@/shared/utils/auth';
 import { successResponse } from '@/shared/application/api-response.dto';
 import { workspaceMembershipGuard, requireWorkspaceRole } from '@/shared/guards/workspace-membership.guard';
 import { authBridgeMiddleware } from '@/shared/presentation/middlewares/auth-bridge.middleware';
@@ -40,7 +41,7 @@ export class WorkspacesController {
   @ApiResponse({ status: 400, description: 'Validation error' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async create(ctx: RequestContext) {
-    const user = ctx.get('user');
+    const user = getUser(ctx);
     const result = await this.createWorkspaceUseCase.execute(user.id, ctx.body);
     ctx.created(successResponse(result, 'Workspace created'));
   }
@@ -50,7 +51,7 @@ export class WorkspacesController {
   @ApiResponse({ status: 200, description: 'List of workspaces' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async list(ctx: RequestContext) {
-    const user = ctx.get('user');
+    const user = getUser(ctx);
     const result = await this.listWorkspacesUseCase.execute(user.id);
     ctx.json(successResponse(result));
   }
@@ -148,7 +149,7 @@ export class WorkspacesController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Not a member of this workspace' })
   async leave(ctx: RequestContext) {
-    const user = ctx.get('user');
+    const user = getUser(ctx);
     await this.leaveWorkspaceUseCase.execute(ctx.params.workspaceId, user.id);
     ctx.json(successResponse(null, 'Left workspace'));
   }

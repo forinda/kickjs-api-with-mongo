@@ -16,6 +16,7 @@ import { UpdateTaskUseCase } from '../application/use-cases/update-task.use-case
 import { ChangeStatusUseCase } from '../application/use-cases/change-status.use-case';
 import { UpdateAssigneesUseCase } from '../application/use-cases/update-assignees.use-case';
 import { ReorderTaskUseCase } from '../application/use-cases/reorder-task.use-case';
+import { getUser } from '@/shared/utils/auth';
 import { successResponse } from '@/shared/application/api-response.dto';
 import { projectAccessGuard } from '@/shared/guards/project-access.guard';
 import { MongoTaskRepository } from '../infrastructure/repositories/mongo-task.repository';
@@ -43,7 +44,7 @@ export class TasksController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden - no access to project' })
   async create(ctx: RequestContext) {
-    const user = ctx.get('user');
+    const user = getUser(ctx);
     const result = await this.createTaskUseCase.execute(ctx.params.projectId, user.id, ctx.body);
     ctx.created(successResponse(result, 'Task created'));
   }

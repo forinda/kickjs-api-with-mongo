@@ -5,17 +5,17 @@ import type { RequestContext } from '@forinda/kickjs-http';
 import { env } from '@/config/env';
 
 /**
- * Validates JWT from Authorization header, sets user in ctx metadata,
- * and rejects unauthenticated requests with 401.
+ * Validates JWT from Authorization header and attaches user to req and ctx.
  *
- * Apply at class level on all controllers that require authentication.
- * For public routes, don't use this middleware.
+ * NOTE: Each middleware and handler gets a separate RequestContext instance
+ * with its own metadata Map (see router-builder.ts). So ctx.set() in middleware
+ * is NOT visible to ctx.get() in the handler. We store on req as the shared object,
+ * and also set on ctx for use within the same middleware.
  */
 export const authBridgeMiddleware: MiddlewareHandler = (ctx: RequestContext, next) => {
-  // Check if AuthAdapter already set req.user
-  const existingUser = (ctx.req as any).user;
-  if (existingUser) {
-    ctx.set('user', existingUser);
+  // Check if already authenticated
+  if ((ctx.req as any).user) {
+    ctx.set('user', (ctx.req as any).user);
     return next();
   }
 
@@ -33,6 +33,7 @@ export const authBridgeMiddleware: MiddlewareHandler = (ctx: RequestContext, nex
       email: payload.email,
       globalRole: payload.globalRole ?? 'user',
     };
+    // Store on req (shared across all RequestContext instances for this request)
     (ctx.req as any).user = user;
     ctx.set('user', user);
   } catch {

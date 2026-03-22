@@ -79,6 +79,18 @@ Tracking issues, workarounds, and observations encountered while building with K
 - **Workaround**: Restart `kick dev` fully (not HMR) to get fresh adapter references. Or accept that queue/ws devtools only work after a cold start.
 - **Suggestion**: DevToolsAdapter should discover peer adapters from the app's adapter registry at request time rather than caching constructor references. E.g., `app.getAdapters().find(a => a.name === 'QueueAdapter')`.
 
+### 13. `ctx.set()`/`ctx.get()` metadata NOT shared between middleware and handler
+- **Description**: In `router-builder.ts`, each class/method middleware and the route handler each get a **separate** `new RequestContext(req, res, next)` instance. Since `RequestContext.metadata` is a private `new Map()` per instance, `ctx.set('key', value)` in a `@Middleware` handler is invisible to `ctx.get('key')` in the route handler.
+- **Impact**: Any data stored via `ctx.set()` in middleware (e.g., authenticated user, parsed tokens) cannot be retrieved via `ctx.get()` in the controller method. This makes the documented `ctx.set()`/`ctx.get()` pattern broken for the most common use case: passing data from middleware to handlers.
+- **Workaround**: Store shared per-request data on `req` directly (`(ctx.req as any).user = user`). Create a helper function like `getUser(ctx)` that reads from `(ctx.req as any).user` to keep it clean.
+- **Suggestion**: Either share a single `RequestContext` instance across middleware and handler for the same request, or store the metadata Map on `req` itself so all `RequestContext` wrappers for the same request read/write to the same Map. E.g.:
+  ```typescript
+  private get metadata(): Map<string, any> {
+    if (!(this.req as any).__ctxMeta) (this.req as any).__ctxMeta = new Map();
+    return (this.req as any).__ctxMeta;
+  }
+  ```
+
 ## Feature Requests
 
 ### 1. DevToolsAdapter SSE streaming for live metrics
@@ -122,6 +134,29 @@ Tracking issues, workarounds, and observations encountered while building with K
   wsAdapter.setHeartbeatInterval(15000);
   ```
 - **Use cases**: Tighten heartbeat during incidents to quickly detect dead connections; loosen during low-traffic periods to save resources; allow ops teams to tune via DevTools dashboard without redeployment.
+
+### 4. `kick readme` CLI command to generate/update README.md
+- **Description**: The CLI has no command for generating a README. Projects scaffolded with `kick new` don't include one. There should be a dedicated `kick readme` command that introspects the project and generates a comprehensive README.
+- **Proposed CLI**:
+  ```bash
+  kick readme              # Generate README.md from project state
+  kick readme --update     # Update existing README, preserving custom sections
+  kick readme --format min # Minimal: title, setup, commands only
+  ```
+- **What it should introspect**:
+  - Project name/version/description from `package.json`
+  - Template type from `kick.config.ts`
+  - Installed `@forinda/kickjs-*` packages → tech stack table
+  - Modules from `src/modules/` → module list with descriptions
+  - Routes from controller decorators → API endpoint summary
+  - Env vars from `.env.example` → environment variables table
+  - Scripts from `package.json` → available commands
+  - Swagger endpoint → link to `/docs`
+- **When it should run**:
+  - `kick new` should call `kick readme` automatically after scaffolding
+  - `kick g module` could prompt to update the README
+  - Developers run `kick readme --update` manually as the project grows
+- **Benefit**: Every KickJS project gets a README from the first commit that stays in sync with the actual codebase. No more stale docs.
 
 ## Middleware Types Reference
 
@@ -174,9 +209,102 @@ export class MyController {
 | `@Middleware()` on method | KickJS `MiddlewareHandler` | `(ctx, next)` |
 | Adapter `middleware()` phase | Express `RequestHandler` | `(req, res, next)` |
 
+### 3. Shared `RequestContext` per request lifecycle
+- **Description**: Currently `router-builder.ts` creates a `new RequestContext(req, res, next)` for EACH middleware and handler separately. This means `ctx.set()` in middleware is invisible to `ctx.get()` in the handler because each has its own private `metadata` Map. This forces developers to mutate `req` directly (e.g., `(ctx.req as any).user = user`), which defeats the purpose of having a typed context abstraction.
+- **Proposed solution**: Attach the `RequestContext` to `req` on first creation, then reuse it for all subsequent middleware/handler calls in the same request:
+  ```typescript
+  // In router-builder.ts — replace per-middleware/handler context creation
+
+  // Option A: Lazy singleton per request (recommended)
+  function getOrCreateContext(req: Request, res: Response, next: NextFunction): RequestContext {
+    if (!(req as any).__ctx) {
+      (req as any).__ctx = new RequestContext(req, res, next);
+    }
+    return (req as any).__ctx;
+  }
+
+  // Then in middleware wrappers:
+  handlers.push((req, res, next) => {
+    const ctx = getOrCreateContext(req, res, next);
+    Promise.resolve(mw(ctx, next)).catch(next);
+  });
+
+  // And in the handler:
+  handlers.push(async (req, res, next) => {
+    const ctx = getOrCreateContext(req, res, next);
+    const controller = container.resolve(controllerClass);
+    await controller[route.handlerName](ctx);
+  });
+
+  // Option B: Store metadata on req (minimal change)
+  // In RequestContext constructor:
+  private get metadata(): Map<string, any> {
+    if (!(this.req as any).__ctxMeta) {
+      (this.req as any).__ctxMeta = new Map();
+    }
+    return (this.req as any).__ctxMeta;
+  }
+  ```
+- **Benefits**:
+  - `ctx.set('user', user)` in middleware → `ctx.get('user')` in handler just works
+  - No need to mutate `req` directly for per-request data
+  - Guards and middleware can communicate cleanly via typed context
+  - Aligns with the documented `ctx.set()`/`ctx.get()` API contract
+- **Current workaround**: Use `(ctx.req as any).prop` for shared data, wrap in a helper like `getUser(ctx)` that reads from `req`.
+
+## Working with HMR
+
+KickJS uses Vite HMR via `kick dev`. Understanding what survives a hot reload vs what needs a cold restart saves debugging time.
+
+### What survives HMR (safe to edit)
+| What | Why |
+|---|---|
+| Controller logic | Routes re-mount on rebuild |
+| Use case / service logic | DI resolves fresh instances |
+| DTO / validation schemas | Re-evaluated on import |
+| Guard / middleware logic | Re-registered with routes |
+| Mongoose schemas | With `mongoose.models.X \|\|` guard pattern |
+| Email templates / HTML | Re-evaluated on import |
+
+### What breaks on HMR (needs full restart)
+| What | Why | Symptom |
+|---|---|---|
+| Adapter options | `g.__app.rebuild()` reuses old adapters | Config changes don't take effect |
+| Auth policy changes | Old AuthAdapter persists | `defaultPolicy` stuck on old value |
+| New modules in array | Old app doesn't pick up new modules | New routes don't appear |
+| New adapters in array | Old app doesn't pick up new adapters | New adapter not running |
+| `@Job`/`@Service` processor classes | New class identity ≠ old DI binding | `No binding found for: EmailProcessor` |
+| DevTools peer adapter refs | Old DevTools holds old references | `/_debug/queues` shows "not found" |
+
+### Best practices
+1. **Use `req` for shared per-request data** — `ctx.set()`/`ctx.get()` don't work across middleware → handler (see issue #13). Use a helper:
+   ```typescript
+   // shared/utils/auth.ts
+   export function getUser(ctx: RequestContext): AuthUser {
+     const user = (ctx.req as any).user;
+     if (!user) throw HttpException.unauthorized('Authentication required');
+     return user;
+   }
+   ```
+
+2. **Use `@Autowired()` over `@Inject(TOKEN)` for properties** — `@Inject` is for constructor params only. `@Autowired` resolves by class type which survives HMR better.
+
+3. **Mongoose schemas must use the HMR guard**:
+   ```typescript
+   export const UserModel = (mongoose.models.User as mongoose.Model<UserDocument>)
+     || mongoose.model<UserDocument>('User', userSchema);
+   ```
+
+4. **Ignore `No binding found` errors on reload** — cosmetic HMR artifact. Workers from cold boot keep running.
+
+5. **Restart fully when changing**: adapter config, auth policy, modules array, adapters array, or queue processor classes.
+
+6. **Keep `authBridgeMiddleware` on controllers** — it validates JWT independently of the AuthAdapter (which can't resolve `@Public()` routes due to `beforeRoutes` phase timing).
+
 ## Observations
 
-- **HMR works well**: `kick dev` with Vite HMR correctly reloads on file changes
 - **DI container is singleton**: `Container.getInstance()` returns the same instance throughout the app lifecycle
 - **`@Public()` decorator**: Must be imported from `@forinda/kickjs-auth`, not `@forinda/kickjs-core`
 - **`buildRoutes()` function**: Must be imported from `@forinda/kickjs-http`
+- **`@Autowired()` resolves by class type** — won't work for services registered under Symbol tokens (e.g., `MAILER`). Use constructor `@Inject(SYMBOL)` for those.
+- **`ctx.paginate(fetcher, config)` calls `ctx.qs()` internally** — don't call both; use `ctx.paginate` which handles everything.

@@ -37,19 +37,22 @@ const queueAdapter = new QueueAdapter({
 export const adapters = [
   new MongooseAdapter(env.MONGODB_URI),
   new RedisAdapter(env.REDIS_URL),
-  new AuthAdapter({
-    strategies: [
-      new JwtStrategy({
-        secret: env.JWT_SECRET,
-        mapPayload: (payload: any) => ({
-          id: payload.sub,
-          email: payload.email,
-          globalRole: payload.globalRole ?? 'user',
-        }),
-      }),
-    ],
-    defaultPolicy: 'protected',
-  }),
+  // AuthAdapter disabled — using authBridgeMiddleware for JWT validation instead.
+  // See framework-issues.md #9 — AuthAdapter's beforeRoutes phase can't resolve
+  // controllers, so @Public() never works and defaultPolicy controls everything.
+  // new AuthAdapter({
+  //   strategies: [
+  //     new JwtStrategy({
+  //       secret: env.JWT_SECRET,
+  //       mapPayload: (payload: any) => ({
+  //         id: payload.sub,
+  //         email: payload.email,
+  //         globalRole: payload.globalRole ?? 'user',
+  //       }),
+  //     }),
+  //   ],
+  //   defaultPolicy: 'open',
+  // }),
   wsAdapter,
   new MailerAdapter({
     provider: env.NODE_ENV === 'production'

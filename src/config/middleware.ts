@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import { requestIdMiddleware } from '@/shared/presentation/middlewares/request-id.middleware';
-
+// import {}
 export const middleware = [
   requestIdMiddleware,
   cors(),

@@ -1,3 +1,4 @@
+import { getUser } from '@/shared/utils/auth';
 import type { RequestContext } from '@forinda/kickjs-http';
 import type { MiddlewareHandler } from '@forinda/kickjs-core';
 import { Container, HttpException } from '@forinda/kickjs-core';
@@ -6,7 +7,7 @@ import { ErrorCode } from '@/shared/constants/error-codes';
 import type { IChannelRepository } from '@/modules/channels/domain/repositories/channel.repository';
 
 export const channelMembershipGuard: MiddlewareHandler = async (ctx: RequestContext, next) => {
-  const user = ctx.get('user');
+  const user = getUser(ctx);
   if (!user) {
     throw HttpException.unauthorized('Authentication required');
   }
