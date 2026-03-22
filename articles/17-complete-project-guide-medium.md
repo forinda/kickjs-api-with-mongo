@@ -20,22 +20,20 @@ If you've been following the article series, this brings it all together. If you
 
 Vibed is a task management platform modeled after Jira's API surface. It supports workspaces, projects, task boards with drag-and-drop reordering, comments with @mentions, file attachments, real-time chat channels, live dashboard stats, email notifications, and activity feeds.
 
-| Concern | Technology |
-|---------|------------|
-| Framework | KickJS v1.2.2 (`@forinda/kickjs-*` packages) |
-| Language | TypeScript (ESM) |
-| Database | MongoDB via Mongoose 9 |
-| Cache / Queue broker | Redis (ioredis) |
-| Background jobs | BullMQ |
-| Auth | JWT (access + refresh token rotation), bcryptjs |
-| Email | Resend (production) / ConsoleProvider (development) |
-| Real-time | WebSocket chat (Socket.IO via WsAdapter) |
-| Live updates | Server-Sent Events via `ctx.sse()` |
-| Scheduled jobs | CronAdapter (overdue reminders, daily digest, token cleanup, presence cleanup) |
-| API docs | Swagger via SwaggerAdapter |
-| Dev tools | DevToolsAdapter at `/_debug/*` |
-| Build | Vite + SWC |
-| Package manager | pnpm |
+- **Framework**: KickJS v1.2.2 (`@forinda/kickjs-*` packages)
+- **Language**: TypeScript (ESM)
+- **Database**: MongoDB via Mongoose 9
+- **Cache / Queue broker**: Redis (ioredis)
+- **Background jobs**: BullMQ
+- **Auth**: JWT (access + refresh token rotation), bcryptjs
+- **Email**: Resend (production) / ConsoleProvider (development)
+- **Real-time**: WebSocket chat (Socket.IO via WsAdapter)
+- **Live updates**: Server-Sent Events via `ctx.sse()`
+- **Scheduled jobs**: CronAdapter (overdue reminders, daily digest, token cleanup, presence cleanup)
+- **API docs**: Swagger via SwaggerAdapter
+- **Dev tools**: DevToolsAdapter at `/_debug/*`
+- **Build**: Vite + SWC
+- **Package manager**: pnpm
 
 KickJS is a decorator-driven Node.js framework built on Express 5. It uses TypeScript decorators for routing (`@Get`, `@Post`), dependency injection (`@Service`, `@Inject`, `@Autowired`), validation (`@Validate` with Zod), and documentation (`@ApiTags`, `@ApiOperation`). If you've used NestJS, the patterns will feel familiar — but KickJS is lighter, uses Express directly, and emphasizes convention over configuration.
 
@@ -447,12 +445,10 @@ export class TasksController {
 
 ### DI Pattern Summary
 
-| Where | Technique | When to Use |
-|-------|-----------|-------------|
-| Controller properties | `@Autowired()` | Concrete classes (use cases, repos) |
-| Use case constructor | `@Inject(TOKENS.X)` | Interface-based repos via Symbol tokens |
-| Processor constructor | `@Inject(MAILER)` | Framework service symbols |
-| Module `register()` | `container.registerFactory()` | Mapping tokens to implementations |
+- **Controller properties** — `@Autowired()`: Concrete classes (use cases, repos)
+- **Use case constructor** — `@Inject(TOKENS.X)`: Interface-based repos via Symbol tokens
+- **Processor constructor** — `@Inject(MAILER)`: Framework service symbols
+- **Module `register()`** — `container.registerFactory()`: Mapping tokens to implementations
 
 Critical rule: `@Inject(TOKEN)` only works on constructor parameters. `@Autowired()` only works on properties (resolves by class type). Mixing them up causes silent failures.
 
@@ -854,145 +850,173 @@ Base prefix: `/api/v1`
 
 ### Auth (`/api/v1/auth`) — No auth required
 
-| Method | Path | Description |
-|--------|------|-------------|
-| POST | `/register` | Register new user |
-| POST | `/login` | Login with credentials |
-| POST | `/refresh` | Refresh JWT token pair |
-| POST | `/logout` | Logout (invalidate refresh) |
+```
+METHOD  PATH                                    DESCRIPTION
+------  ------                                  -----------
+POST    /register                               Register new user
+POST    /login                                  Login with credentials
+POST    /refresh                                Refresh JWT token pair
+POST    /logout                                 Logout (invalidate refresh)
+```
 
 ### Users (`/api/v1/users`)
 
-| Method | Path | Description |
-|--------|------|-------------|
-| GET | `/me` | Current user profile |
-| PATCH | `/me` | Update profile |
-| GET | `/:id` | Get user by ID |
-| GET | `/` | List users (paginated) |
+```
+METHOD  PATH                                    DESCRIPTION
+------  ------                                  -----------
+GET     /me                                     Current user profile
+PATCH   /me                                     Update profile
+GET     /:id                                    Get user by ID
+GET     /                                       List users (paginated)
+```
 
 ### Workspaces (`/api/v1/workspaces`)
 
-| Method | Path | Description |
-|--------|------|-------------|
-| POST | `/` | Create workspace |
-| GET | `/` | List user's workspaces |
-| GET | `/:workspaceId` | Get workspace |
-| PATCH | `/:workspaceId` | Update workspace |
-| DELETE | `/:workspaceId` | Delete workspace |
-| POST | `/:workspaceId/invite` | Invite member |
-| GET | `/:workspaceId/members` | List members |
-| PATCH | `/:workspaceId/members/:userId` | Update member role |
-| DELETE | `/:workspaceId/members/:userId` | Remove member |
-| POST | `/:workspaceId/leave` | Leave workspace |
+```
+METHOD  PATH                                    DESCRIPTION
+------  ------                                  -----------
+POST    /                                       Create workspace
+GET     /                                       List user's workspaces
+GET     /:workspaceId                           Get workspace
+PATCH   /:workspaceId                           Update workspace
+DELETE  /:workspaceId                           Delete workspace
+POST    /:workspaceId/invite                    Invite member
+GET     /:workspaceId/members                   List members
+PATCH   /:workspaceId/members/:userId           Update member role
+DELETE  /:workspaceId/members/:userId           Remove member
+POST    /:workspaceId/leave                     Leave workspace
+```
 
 ### Projects (`/api/v1`)
 
-| Method | Path | Description |
-|--------|------|-------------|
-| POST | `/workspaces/:workspaceId/projects` | Create project |
-| GET | `/workspaces/:workspaceId/projects` | List projects |
-| GET | `/projects/:projectId` | Get project |
-| PATCH | `/projects/:projectId` | Update project |
-| DELETE | `/projects/:projectId` | Delete project |
-| GET | `/projects/:projectId/board` | Board view |
+```
+METHOD  PATH                                    DESCRIPTION
+------  ------                                  -----------
+POST    /workspaces/:workspaceId/projects       Create project
+GET     /workspaces/:workspaceId/projects       List projects
+GET     /projects/:projectId                    Get project
+PATCH   /projects/:projectId                    Update project
+DELETE  /projects/:projectId                    Delete project
+GET     /projects/:projectId/board              Board view
+```
 
 ### Tasks (`/api/v1`)
 
-| Method | Path | Description |
-|--------|------|-------------|
-| POST | `/projects/:projectId/tasks` | Create task |
-| GET | `/projects/:projectId/tasks` | List tasks (paginated) |
-| GET | `/tasks/:taskId` | Get task |
-| PATCH | `/tasks/:taskId` | Update task |
-| DELETE | `/tasks/:taskId` | Delete task |
-| PATCH | `/tasks/:taskId/status` | Change status |
-| PATCH | `/tasks/:taskId/assignees` | Update assignees |
-| POST | `/tasks/:taskId/reorder` | Reorder in column |
-| GET | `/tasks/:taskId/subtasks` | List subtasks |
+```
+METHOD  PATH                                    DESCRIPTION
+------  ------                                  -----------
+POST    /projects/:projectId/tasks              Create task
+GET     /projects/:projectId/tasks              List tasks (paginated)
+GET     /tasks/:taskId                          Get task
+PATCH   /tasks/:taskId                          Update task
+DELETE  /tasks/:taskId                          Delete task
+PATCH   /tasks/:taskId/status                   Change status
+PATCH   /tasks/:taskId/assignees                Update assignees
+POST    /tasks/:taskId/reorder                  Reorder in column
+GET     /tasks/:taskId/subtasks                 List subtasks
+```
 
 ### Comments (`/api/v1`)
 
-| Method | Path | Description |
-|--------|------|-------------|
-| POST | `/tasks/:taskId/comments` | Create comment |
-| GET | `/tasks/:taskId/comments` | List comments |
-| PATCH | `/comments/:commentId` | Update comment |
-| DELETE | `/comments/:commentId` | Delete comment |
+```
+METHOD  PATH                                    DESCRIPTION
+------  ------                                  -----------
+POST    /tasks/:taskId/comments                 Create comment
+GET     /tasks/:taskId/comments                 List comments
+PATCH   /comments/:commentId                    Update comment
+DELETE  /comments/:commentId                    Delete comment
+```
 
 ### Labels (`/api/v1`)
 
-| Method | Path | Description |
-|--------|------|-------------|
-| POST | `/workspaces/:workspaceId/labels` | Create label |
-| GET | `/workspaces/:workspaceId/labels` | List labels |
-| PATCH | `/labels/:labelId` | Update label |
-| DELETE | `/labels/:labelId` | Delete label |
+```
+METHOD  PATH                                    DESCRIPTION
+------  ------                                  -----------
+POST    /workspaces/:workspaceId/labels         Create label
+GET     /workspaces/:workspaceId/labels         List labels
+PATCH   /labels/:labelId                        Update label
+DELETE  /labels/:labelId                        Delete label
+```
 
 ### Attachments (`/api/v1`)
 
-| Method | Path | Description |
-|--------|------|-------------|
-| POST | `/tasks/:taskId/attachments` | Upload |
-| GET | `/tasks/:taskId/attachments` | List |
-| GET | `/attachments/:attachmentId` | Metadata |
-| GET | `/attachments/:attachmentId/download` | Download |
-| DELETE | `/attachments/:attachmentId` | Delete |
+```
+METHOD  PATH                                    DESCRIPTION
+------  ------                                  -----------
+POST    /tasks/:taskId/attachments              Upload
+GET     /tasks/:taskId/attachments              List
+GET     /attachments/:attachmentId              Metadata
+GET     /attachments/:attachmentId/download     Download
+DELETE  /attachments/:attachmentId              Delete
+```
 
 ### Channels (`/api/v1`)
 
-| Method | Path | Description |
-|--------|------|-------------|
-| POST | `/workspaces/:workspaceId/channels` | Create channel |
-| GET | `/workspaces/:workspaceId/channels` | List channels |
-| GET | `/channels/:channelId` | Get channel |
-| DELETE | `/channels/:channelId` | Delete channel |
-| POST | `/channels/:channelId/members` | Add member |
-| DELETE | `/channels/:channelId/members/:userId` | Remove member |
+```
+METHOD  PATH                                    DESCRIPTION
+------  ------                                  -----------
+POST    /workspaces/:workspaceId/channels       Create channel
+GET     /workspaces/:workspaceId/channels       List channels
+GET     /channels/:channelId                    Get channel
+DELETE  /channels/:channelId                    Delete channel
+POST    /channels/:channelId/members            Add member
+DELETE  /channels/:channelId/members/:userId    Remove member
+```
 
 ### Messages (`/api/v1`)
 
-| Method | Path | Description |
-|--------|------|-------------|
-| GET | `/channels/:channelId/messages` | Message history |
-| PATCH | `/messages/:messageId` | Edit message |
-| DELETE | `/messages/:messageId` | Delete message |
+```
+METHOD  PATH                                    DESCRIPTION
+------  ------                                  -----------
+GET     /channels/:channelId/messages           Message history
+PATCH   /messages/:messageId                    Edit message
+DELETE  /messages/:messageId                    Delete message
+```
 
 ### Notifications (`/api/v1/notifications`)
 
-| Method | Path | Description |
-|--------|------|-------------|
-| GET | `/` | List (paginated) |
-| PATCH | `/:id/read` | Mark as read |
-| POST | `/read-all` | Mark all as read |
-| GET | `/unread-count` | Unread count |
+```
+METHOD  PATH                                    DESCRIPTION
+------  ------                                  -----------
+GET     /                                       List (paginated)
+PATCH   /:id/read                               Mark as read
+POST    /read-all                               Mark all as read
+GET     /unread-count                           Unread count
+```
 
 ### Activity (`/api/v1`)
 
-| Method | Path | Description |
-|--------|------|-------------|
-| GET | `/workspaces/:workspaceId/activity` | Workspace activity |
-| GET | `/projects/:projectId/activity` | Project activity |
-| GET | `/tasks/:taskId/activity` | Task activity |
+```
+METHOD  PATH                                    DESCRIPTION
+------  ------                                  -----------
+GET     /workspaces/:workspaceId/activity       Workspace activity
+GET     /projects/:projectId/activity           Project activity
+GET     /tasks/:taskId/activity                 Task activity
+```
 
 ### Stats — SSE (`/api/v1`)
 
-| Method | Path | Description |
-|--------|------|-------------|
-| GET | `/workspaces/:workspaceId/stats/live` | SSE workspace stats |
-| GET | `/projects/:projectId/stats/live` | SSE project stats |
-| GET | `/workspaces/:workspaceId/activity/live` | SSE activity stream |
+```
+METHOD  PATH                                    DESCRIPTION
+------  ------                                  -----------
+GET     /workspaces/:workspaceId/stats/live     SSE workspace stats
+GET     /projects/:projectId/stats/live         SSE project stats
+GET     /workspaces/:workspaceId/activity/live  SSE activity stream
+```
 
 ### WebSocket (`/ws/chat`)
 
-| Event | Direction | Description |
-|-------|-----------|-------------|
-| `channel:join` | Client -> Server | Join room |
-| `channel:leave` | Client -> Server | Leave room |
-| `message:send` | Client -> Server | Send message |
-| `message:edit` | Client -> Server | Edit message |
-| `message:delete` | Client -> Server | Delete message |
-| `channel:typing` | Client -> Server | Typing indicator |
-| `channel:stop_typing` | Client -> Server | Stop typing |
+```
+EVENT                DIRECTION          DESCRIPTION
+-----                ---------          -----------
+channel:join         Client -> Server   Join room
+channel:leave        Client -> Server   Leave room
+message:send         Client -> Server   Send message
+message:edit         Client -> Server   Edit message
+message:delete       Client -> Server   Delete message
+channel:typing       Client -> Server   Typing indicator
+channel:stop_typing  Client -> Server   Stop typing
+```
 
 ***
 
@@ -1002,12 +1026,10 @@ We tracked 18 framework issues in `framework-filed-issues/` — 13 bug reports, 
 
 Key issues and their resolutions:
 
-| Issue | Problem | Resolution |
-|-------|---------|------------|
-| KICK-003 | Modules without routes crash Express | v1.2.3: `routes()` can return `null` |
-| KICK-009 | `ctx.set/get` not shared across middleware/handler | v1.2.5: Metadata Map stored on `req` |
-| KICK-016 | `@Service + @Job` not auto-registered in DI | v1.2.6: QueueAdapter auto-registers |
-| KICK-017 | `@Service()` should mean auto-DI-registration | v1.2.7: Container.bootstrap() scans |
+- **KICK-003** — Modules without routes crash Express. *Resolution*: v1.2.3: `routes()` can return `null`
+- **KICK-009** — `ctx.set/get` not shared across middleware/handler. *Resolution*: v1.2.5: Metadata Map stored on `req`
+- **KICK-016** — `@Service + @Job` not auto-registered in DI. *Resolution*: v1.2.6: QueueAdapter auto-registers
+- **KICK-017** — `@Service()` should mean auto-DI-registration. *Resolution*: v1.2.7: Container.bootstrap() scans
 
 The feedback loop that made this work: discover the bug during development, build a workaround, file a detailed issue with a suggested fix, validate the upstream fix, remove the workaround, update the docs.
 
@@ -1057,17 +1079,19 @@ kick g dto <name>     # Generate Zod DTO
 
 ### Key File Paths
 
-| File | Purpose |
-|------|---------|
-| `src/index.ts` | Entry point |
-| `src/config/adapters.ts` | All adapter configurations |
-| `src/config/env.ts` | Zod env validation |
-| `src/modules/index.ts` | Module registry |
-| `src/shared/constants/tokens.ts` | DI Symbol tokens |
-| `src/shared/constants/query-configs.ts` | Pagination configs |
-| `src/shared/utils/auth.ts` | `getUser(ctx)` helper |
-| `src/shared/guards/` | Access control guards |
-| `framework-filed-issues/` | Framework issue tracker |
+```
+FILE                                    PURPOSE
+----                                    -------
+src/index.ts                            Entry point
+src/config/adapters.ts                  All adapter configurations
+src/config/env.ts                       Zod env validation
+src/modules/index.ts                    Module registry
+src/shared/constants/tokens.ts          DI Symbol tokens
+src/shared/constants/query-configs.ts   Pagination configs
+src/shared/utils/auth.ts               getUser(ctx) helper
+src/shared/guards/                      Access control guards
+framework-filed-issues/                 Framework issue tracker
+```
 
 ***
 
