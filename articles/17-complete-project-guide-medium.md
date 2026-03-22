@@ -1,11 +1,10 @@
----
-title: "Building a Complete Jira-like Task Management Backend with KickJS — From Scaffold to Production"
-published: false
-description: "The comprehensive guide to building Vibed: a 65+ endpoint task management backend with KickJS, MongoDB, Redis, BullMQ, Socket.IO, and SSE. Covers auth, DDD modules, real-time features, background jobs, pagination, database seeding, and framework contributions."
-tags: kickjs, mongodb, typescript, nodejs, mongoose
-series: "Building with KickJS"
-cover_image: ""
----
+Published on Medium
+
+# Building a Complete Jira-like Task Management Backend with KickJS — From Scaffold to Production
+
+*The comprehensive guide to building Vibed: a 65+ endpoint task management backend with KickJS, MongoDB, Redis, BullMQ, Socket.IO, and SSE. Covers auth, DDD modules, real-time features, background jobs, pagination, database seeding, and framework contributions.*
+
+***
 
 ## TL;DR
 
@@ -13,7 +12,9 @@ This is the complete project guide for Vibed — a Jira-like task management bac
 
 If you've been following the article series, this brings it all together. If you're starting here, this is everything you need to build a non-trivial backend with KickJS.
 
----
+> *This article is part of the "Building with KickJS" series, where we build a production-grade task management backend from scratch. Each article in the series covers a specific aspect of the architecture — this one ties everything together as the complete reference guide.*
+
+***
 
 ## 1. Project Overview and Tech Stack
 
@@ -21,7 +22,7 @@ Vibed is a task management platform modeled after Jira's API surface. It support
 
 | Concern | Technology |
 |---------|------------|
-| Framework | KickJS v1.2.7 (`@forinda/kickjs-*` packages) |
+| Framework | KickJS v1.2.2 (`@forinda/kickjs-*` packages) |
 | Language | TypeScript (ESM) |
 | Database | MongoDB via Mongoose 9 |
 | Cache / Queue broker | Redis (ioredis) |
@@ -38,7 +39,7 @@ Vibed is a task management platform modeled after Jira's API surface. It support
 
 KickJS is a decorator-driven Node.js framework built on Express 5. It uses TypeScript decorators for routing (`@Get`, `@Post`), dependency injection (`@Service`, `@Inject`, `@Autowired`), validation (`@Validate` with Zod), and documentation (`@ApiTags`, `@ApiOperation`). If you've used NestJS, the patterns will feel familiar — but KickJS is lighter, uses Express directly, and emphasizes convention over configuration.
 
----
+***
 
 ## 2. Project Setup
 
@@ -147,7 +148,7 @@ export const middleware = [
 ];
 ```
 
----
+***
 
 ## 3. Authentication: JWT with Refresh Rotation
 
@@ -264,7 +265,7 @@ export const workspaceMembershipGuard: MiddlewareHandler = async (ctx, next) => 
 
 Guards resolve repositories from the DI container at request time via `Container.getInstance()`. This avoids circular dependency issues that arise when guards depend on repositories that depend on modules.
 
----
+***
 
 ## 4. Core Modules: DDD Structure Walkthrough
 
@@ -455,7 +456,7 @@ export class TasksController {
 
 Critical rule: `@Inject(TOKEN)` only works on constructor parameters. `@Autowired()` only works on properties (resolves by class type). Mixing them up causes silent failures.
 
----
+***
 
 ## 5. Supporting Modules
 
@@ -475,7 +476,7 @@ File upload using multipart form data. Files are converted to base64 and stored 
 
 In-app notification system. Notifications are created by background jobs (not directly by controllers). Endpoints: list paginated, mark as read, mark all as read, unread count. The unread count endpoint is what the frontend polls for the notification badge.
 
----
+***
 
 ## 6. Real-Time: WebSocket Chat and SSE Stats
 
@@ -579,7 +580,7 @@ export class StatsController {
 
 SSE endpoints: workspace live stats, project live stats, workspace activity live.
 
----
+***
 
 ## 7. Background Jobs: BullMQ Processors
 
@@ -676,7 +677,7 @@ new CronAdapter({
 });
 ```
 
----
+***
 
 ## 8. Pagination: ctx.paginate and Query Configs
 
@@ -766,7 +767,7 @@ export function buildMongoSort(
 }
 ```
 
----
+***
 
 ## 9. DI Tokens
 
@@ -793,7 +794,7 @@ export const TOKENS = {
 } as const;
 ```
 
----
+***
 
 ## 10. Full Module Structure
 
@@ -845,7 +846,7 @@ src/
     └── cron/                         # Scheduled jobs
 ```
 
----
+***
 
 ## 11. API Endpoint Summary
 
@@ -993,7 +994,7 @@ Base prefix: `/api/v1`
 | `channel:typing` | Client -> Server | Typing indicator |
 | `channel:stop_typing` | Client -> Server | Stop typing |
 
----
+***
 
 ## 12. Framework Issues and Contributing Back
 
@@ -1010,7 +1011,7 @@ Key issues and their resolutions:
 
 The feedback loop that made this work: discover the bug during development, build a workaround, file a detailed issue with a suggested fix, validate the upstream fix, remove the workaround, update the docs.
 
----
+***
 
 ## 13. What's Next
 
@@ -1031,7 +1032,7 @@ The current in-memory `onlineUsers` Map works for single-instance deployments. F
 ### Full-Text Search Upgrade
 The current `$text` search works but is limited. Moving to MongoDB Atlas Search or Elasticsearch would enable fuzzy matching, typo tolerance, and field-weighted ranking.
 
----
+***
 
 ## Quick Reference
 
@@ -1068,6 +1069,12 @@ kick g dto <name>     # Generate Zod DTO
 | `src/shared/guards/` | Access control guards |
 | `framework-filed-issues/` | Framework issue tracker |
 
----
+***
 
 *This is the final article in the "Building with KickJS" series. The full project source is available on GitHub. If you build something with KickJS, I'd genuinely like to hear about it.*
+
+***
+
+### About the Author
+
+*Full-stack developer building developer tools and backend systems with TypeScript. Creator of KickJS, a decorator-driven Node.js framework. Passionate about clean architecture, DDD patterns, and developer experience. Follow for more deep dives into backend engineering and framework design.*

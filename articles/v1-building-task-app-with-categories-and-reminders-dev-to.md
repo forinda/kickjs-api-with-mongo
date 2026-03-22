@@ -2,10 +2,12 @@
 title: "Building a Jira-Like Task API with KickJS — Auth, WebSocket Chat, SSE, Queues & More"
 published: false
 description: "How I built a 65-endpoint task management backend with KickJS — a decorator-driven TypeScript framework. Real code, real gotchas, real lessons."
-tags: kickjs, typescript, nodejs, webdev
+tags: kickjs, mongodb, typescript, nodejs, webdev
 series: "Building with KickJS"
 cover_image: ""
 ---
+
+> **Update:** This article documents the initial build and the problems encountered along the way. Many of the gotchas described here (ctx.set/get isolation, DI registration, controller HMR) have been resolved in KickJS v1.2.5–v1.2.7. The workarounds shown are still valid but no longer necessary on the latest version. See the [complete project guide](17-complete-project-guide.md) for the current patterns.
 
 ## TL;DR
 

@@ -22,7 +22,9 @@ Three reasons made the decision for me:
 
 3. **Minimal abstraction over Express.** KickJS does not hide Express. Your global middleware is still `(req, res, next)`. Your route handlers get a `RequestContext` wrapper, but you can drop down to `ctx.req` and `ctx.res` anytime. When something breaks, you debug Express, not a proprietary runtime.
 
-The trade-off: KickJS is at v1.2.2. Documentation has gaps. Some APIs behave differently from what the docs describe. I will call out every case I hit.
+The trade-off: KickJS was at v1.2.2 when I started. Documentation had gaps. Some APIs behaved differently from what the docs described. I called out every case I hit — and many of those issues have since been fixed in v1.2.5 through v1.2.7.
+
+> **Update:** This article documents the problems encountered during initial development. Many gotchas described here (ctx.set/get isolation, DI auto-registration, controller HMR) have been resolved in later KickJS releases. See the [complete project guide](17-complete-project-guide.md) for the current state of the codebase.
 
 ---
 
