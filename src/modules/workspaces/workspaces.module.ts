@@ -5,6 +5,12 @@ import { MongoWorkspaceRepository } from './infrastructure/repositories/mongo-wo
 import { MongoWorkspaceMemberRepository } from './infrastructure/repositories/mongo-workspace-member.repository';
 import { WorkspacesController } from './presentation/workspaces.controller';
 
+// Eagerly load decorated classes so @Service()/@Repository() decorators register in the DI container
+import.meta.glob(
+  ['./application/use-cases/**/*.ts', './infrastructure/repositories/**/*.ts', '!./**/*.test.ts'],
+  { eager: true },
+);
+
 export class WorkspacesModule implements AppModule {
   register(container: Container): void {
     container.registerFactory(TOKENS.WORKSPACE_REPOSITORY, () =>

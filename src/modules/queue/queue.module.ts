@@ -1,8 +1,10 @@
 import type { AppModule, ModuleRoutes, Container } from '@forinda/kickjs-core';
-// Side-effect imports ensure @Job() decorators populate the jobRegistry
-import './infrastructure/processors/email.processor';
-import './infrastructure/processors/notification.processor';
-import './infrastructure/processors/activity.processor';
+
+// Eagerly load decorated classes so @Job() decorators populate the jobRegistry
+import.meta.glob(
+  ['./infrastructure/processors/**/*.ts', '!./**/*.test.ts'],
+  { eager: true },
+);
 
 export class QueueModule implements AppModule {
   register(_container: Container): void {
