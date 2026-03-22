@@ -23,6 +23,7 @@ Each issue file maps to the GitHub issue templates at [kick-js/.github/ISSUE_TEM
 | [KICK-012](./KICK-012.md) | DevToolsAdapter `peerAdapters` lost on HMR rebuild | devtools | Low | Open | — |
 | [KICK-013](./KICK-013.md) | `@Job`/`@Service` classes lose DI binding on HMR | queue | Low | Released | v1.2.6 |
 | [KICK-016](./KICK-016.md) | `@Service()` + `@Job()` classes not auto-registered in DI | queue, core | High | Released | v1.2.6 |
+| [KICK-019](./KICK-019.md) | `kick g module` should ensure `vite/client` types in tsconfig | cli | Low | Open | — |
 
 ### Documentation Issues (`[Docs]:`)
 

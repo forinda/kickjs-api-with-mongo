@@ -83,6 +83,19 @@ Tracking issues, workarounds, and observations encountered while building with K
 - **Status**: Resolved in KickJS v1.2.5. The metadata Map is now stored on `req` and shared across all `RequestContext` instances for the same request. `ctx.set()` in middleware is visible to `ctx.get()` in the handler.
 - **Migration**: Use `ctx.get<T>('key')` / `ctx.set('key', value)` directly — no need for `(ctx.req as any)` workarounds.
 
+### 14. `import.meta.glob` requires `vite/client` types in tsconfig.json
+- **Description**: KickJS DDD modules use `import.meta.glob([...], { eager: true })` for eager loading of decorated classes (services, repositories, use cases). TypeScript does not recognize `import.meta.glob` without the `vite/client` type definitions, causing a compile error: `Property 'glob' does not exist on type 'ImportMeta'`.
+- **Impact**: Any project using the generated DDD/REST/CQRS module patterns will get TypeScript errors until `vite/client` is added to `tsconfig.json`.
+- **Fix**: Add `"vite/client"` to `compilerOptions.types` in `tsconfig.json`:
+  ```json
+  {
+    "compilerOptions": {
+      "types": ["vite/client"]
+    }
+  }
+  ```
+- **Suggestion**: The `kick new` scaffold or `kick g module` generator should ensure `vite/client` is in `tsconfig.json` types when generating modules that use `import.meta.glob`.
+
 ## Feature Requests
 
 ### 1. DevToolsAdapter SSE streaming for live metrics
@@ -281,7 +294,9 @@ KickJS uses Vite HMR via `kick dev`. Understanding what survives a hot reload vs
 
 2. **Use `@Autowired()` over `@Inject(TOKEN)` for properties** — `@Inject` is for constructor params only. `@Autowired` resolves by class type which survives HMR better.
 
-3. **Mongoose schemas must use the HMR guard**:
+3. **Add `vite/client` types for `import.meta.glob`** — DDD modules use `import.meta.glob` for eager loading. Without `"vite/client"` in `tsconfig.json` types, TypeScript reports `Property 'glob' does not exist on type 'ImportMeta'`.
+
+4. **Mongoose schemas must use the HMR guard**:
    ```typescript
    export const UserModel = (mongoose.models.User as mongoose.Model<UserDocument>)
      || mongoose.model<UserDocument>('User', userSchema);
