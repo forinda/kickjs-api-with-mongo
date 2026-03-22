@@ -1,4 +1,3 @@
-import { getUser } from '@/shared/utils/auth';
 import type { RequestContext } from '@forinda/kickjs-http';
 import type { MiddlewareHandler } from '@forinda/kickjs-core';
 import { Container, HttpException } from '@forinda/kickjs-core';
@@ -8,7 +7,7 @@ import type { IProjectRepository } from '@/modules/projects/domain/repositories/
 import type { IWorkspaceMemberRepository } from '@/modules/workspaces/domain/repositories/workspace-member.repository';
 
 export const projectAccessGuard: MiddlewareHandler = async (ctx: RequestContext, next) => {
-  const user = getUser(ctx);
+  const user = ctx.get('user');
   if (!user) {
     throw HttpException.unauthorized('Authentication required');
   }

@@ -169,25 +169,25 @@ export function authBridgeMiddleware(
 
 This way, the auth guard always has a user (or `null`) to work with, and `@Public()` routes can proceed even without a token.
 
-### Chapter 3: The ctx.set()/ctx.get() Trap
+### Chapter 3: The ctx.set()/ctx.get() Fix
 
-Here's the gotcha that burned the most time:
+This used to be a major gotcha — `ctx.set()` in middleware was invisible to `ctx.get()` in the handler because each got a separate `RequestContext` instance with its own metadata Map.
+
+**Good news: fixed in KickJS v1.2.5.** The metadata Map is now stored on `req` and shared across all `RequestContext` instances for the same request. `ctx.set()`/`ctx.get()` works exactly as you'd expect:
 
 ```typescript
 // In middleware:
-ctx.set('user', payload);  // ✅ Sets on THIS context
+ctx.set('user', payload);  // ✅ Sets on shared metadata
 
 // In route handler:
-const user = ctx.get('user');  // ❌ UNDEFINED
+const user = ctx.get<AuthUser>('user');  // ✅ Works!
 ```
 
-`ctx.set()` and `ctx.get()` in KickJS **do not share state** between global middleware and route handlers the way you'd expect. The context object gets reconstructed.
-
-The fix was a helper that reads from the right place:
+A clean helper keeps it centralized:
 
 ```typescript
 export function getUser(ctx: Context): AuthUser {
-  const user = ctx.get('user') ?? (ctx as any)._locals?.user;
+  const user = ctx.get<AuthUser>('user');
 
   if (!user) {
     throw new UnauthorizedException('Not authenticated');
@@ -196,8 +196,6 @@ export function getUser(ctx: Context): AuthUser {
   return user;
 }
 ```
-
-Not pretty. But it works everywhere.
 
 ---
 
@@ -438,9 +436,9 @@ app.use((ctx, next) => {
 // ctx.body ✅, ctx.query ✅, ctx.params ✅
 ```
 
-### 4. ctx.set/get NOT Shared Across Middleware/Handler
+### 4. ctx.set/get Shared Across Middleware/Handler (Fixed in v1.2.5)
 
-Already covered this one above. Use the `getUser(ctx)` helper pattern or `res.locals`.
+This was a pain point in earlier versions but is now fixed. Use `ctx.set()`/`ctx.get()` directly — no `res.locals` workaround needed.
 
 ### 5. @Inject for Constructors, @Autowired for Properties
 
@@ -554,7 +552,7 @@ Modules include: auth, users, workspaces, projects, sprints, tasks, task-comment
 1. **Start with the auth bridge middleware** — don't fight `@Public()` for two hours first
 2. **Use property injection everywhere** — `@Autowired()` is simpler than constructor `@Inject()`
 3. **String-based queue names from day one** — saves a refactor later
-4. **Build the `getUser(ctx)` helper immediately** — you'll call it in every single guarded route
+4. **Build the `getUser(ctx)` helper immediately** — uses `ctx.get<AuthUser>('user')` under the hood, called in every guarded route
 
 ---
 

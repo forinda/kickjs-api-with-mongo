@@ -8,7 +8,6 @@ import { USER_QUERY_CONFIG } from '@/shared/constants/query-configs';
 import { GetProfileUseCase } from '../application/use-cases/get-profile.use-case';
 import { UpdateProfileUseCase } from '../application/use-cases/update-profile.use-case';
 import { ListUsersUseCase } from '../application/use-cases/list-users.use-case';
-import { getUser } from '@/shared/utils/auth';
 import { successResponse } from '@/shared/application/api-response.dto';
 import { z } from 'zod';
 import { authBridgeMiddleware } from '@/shared/presentation/middlewares/auth-bridge.middleware';
@@ -27,7 +26,7 @@ export class UsersController {
   @ApiResponse({ status: 200, description: 'User profile retrieved' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async getMe(ctx: RequestContext) {
-    const user = getUser(ctx);
+    const user = ctx.get('user');
     const result = await this.getProfileUseCase.execute(user.id);
     ctx.json(successResponse(result));
   }
@@ -38,7 +37,7 @@ export class UsersController {
   @ApiResponse({ status: 400, description: 'Validation error' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async updateMe(ctx: RequestContext) {
-    const user = getUser(ctx);
+    const user = ctx.get('user');
     const result = await this.updateProfileUseCase.execute(user.id, ctx.body);
     ctx.json(successResponse(result));
   }

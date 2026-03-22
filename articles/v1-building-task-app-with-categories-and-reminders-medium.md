@@ -252,8 +252,7 @@ In practice, I hit a wall. The `AuthAdapter` runs in the `beforeRoutes` lifecycl
 
 ```typescript
 export const authBridgeMiddleware: MiddlewareHandler = (ctx: RequestContext, next) => {
-  if ((ctx.req as any).user) {
-    ctx.set('user', (ctx.req as any).user);
+  if (ctx.get('user')) {
     return next();
   }
 
@@ -270,7 +269,6 @@ export const authBridgeMiddleware: MiddlewareHandler = (ctx: RequestContext, nex
       email: payload.email,
       globalRole: payload.globalRole ?? 'user',
     };
-    (ctx.req as any).user = user;
     ctx.set('user', user);
   } catch {
     throw HttpException.unauthorized('Invalid or expired token');
@@ -284,15 +282,13 @@ Protected controllers get `@Middleware(authBridgeMiddleware)` at the class level
 
 ### The `getUser()` Helper
 
-Notice the middleware stores the user on **`ctx.req`**, not just `ctx.set()`. This is critical.
+The middleware stores the user via `ctx.set('user', user)`. Since KickJS v1.2.5, the metadata map is shared across all `RequestContext` instances for the same request, so `ctx.get('user')` works correctly in handlers.
 
-> **Gotcha #4:** `ctx.set()` and `ctx.get()` are **not shared** between middleware and handler. KickJS creates a separate `RequestContext` instance for each middleware and for the route handler. Each instance has its own private `metadata` Map. Data stored via `ctx.set()` in middleware is invisible to `ctx.get()` in the handler.
-
-The workaround: store shared per-request data on `req` directly and read it through a helper:
+A simple helper keeps things clean:
 
 ```typescript
 export function getUser(ctx: RequestContext): AuthUser {
-  const user = (ctx.req as any).user as AuthUser | undefined;
+  const user = ctx.get<AuthUser>('user');
   if (!user) {
     throw HttpException.unauthorized('Authentication required');
   }

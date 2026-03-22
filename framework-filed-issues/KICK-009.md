@@ -1,9 +1,9 @@
 # KICK-009: `ctx.set()`/`ctx.get()` not shared between middleware and handler
 
-- **Status**: Open
+- **Status**: Closed (Fixed)
 - **Severity**: Critical
 - **Found in**: v1.2.2
-- **Fixed in**: —
+- **Fixed in**: v1.2.5
 - **Component**: http
 
 ## Description
@@ -32,21 +32,16 @@ TypeError: Cannot read properties of undefined (reading 'id')
 - OS: Linux (Ubuntu)
 - Package manager: pnpm
 
-## Workaround
-Store data directly on the raw request object and use a helper to read it:
+## Resolution
+Fixed in KickJS v1.2.5. The metadata `Map` is now stored on `req` and shared across all `RequestContext` instances for the same request. `ctx.set()` in middleware is visible to `ctx.get()` in the handler.
 
 ```ts
 // In middleware
-(ctx.req as any).user = userData;
+ctx.set('user', userData);
 
-// Helper
-function getUser(ctx: RequestContext) {
-  return (ctx.req as any).user;
-}
+// In handler
+const user = ctx.get<AuthUser>('user');
 ```
-
-## Suggested Fix
-Share a single `RequestContext` per request OR store the metadata `Map` on the `req` object so all `RequestContext` wrappers created for the same request share the same underlying map.
 
 ## References
 - framework-issues.md section

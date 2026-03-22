@@ -4,7 +4,6 @@ import { HttpException } from '@forinda/kickjs-core';
 import { z } from 'zod';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@forinda/kickjs-swagger';
 import { ErrorCode } from '@/shared/constants/error-codes';
-import { getUser } from '@/shared/utils/auth';
 import { successResponse } from '@/shared/application/api-response.dto';
 import { channelMembershipGuard } from '@/shared/guards/channel-membership.guard';
 import { MongoMessageRepository } from '../infrastructure/repositories/mongo-message.repository';
@@ -43,7 +42,7 @@ export class MessagesController {
     body: z.object({ content: z.string().min(1) }),
   })
   async edit(ctx: RequestContext) {
-    const user = getUser(ctx);
+    const user = ctx.get('user');
     const message = await this.messageRepo.findById(ctx.params.messageId);
     if (!message) throw HttpException.notFound(ErrorCode.MESSAGE_NOT_FOUND);
     if (message.senderId.toString() !== user.id) throw HttpException.forbidden(ErrorCode.NOT_MESSAGE_AUTHOR);
@@ -57,7 +56,7 @@ export class MessagesController {
   @ApiResponse({ status: 404, description: 'Message not found' })
   @Delete('/messages/:messageId', { params: z.object({ messageId: z.string() }) })
   async delete(ctx: RequestContext) {
-    const user = getUser(ctx);
+    const user = ctx.get('user');
     const message = await this.messageRepo.findById(ctx.params.messageId);
     if (!message) throw HttpException.notFound(ErrorCode.MESSAGE_NOT_FOUND);
     if (message.senderId.toString() !== user.id) throw HttpException.forbidden(ErrorCode.NOT_MESSAGE_AUTHOR);

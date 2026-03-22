@@ -7,7 +7,6 @@ import { ErrorCode } from '@/shared/constants/error-codes';
 import { createCommentSchema } from '../application/dtos/create-comment.dto';
 import { updateCommentSchema } from '../application/dtos/update-comment.dto';
 import { CreateCommentUseCase } from '../application/use-cases/create-comment.use-case';
-import { getUser } from '@/shared/utils/auth';
 import { successResponse } from '@/shared/application/api-response.dto';
 import { MongoCommentRepository } from '../infrastructure/repositories/mongo-comment.repository';
 import { MongoTaskRepository } from '@/modules/tasks/infrastructure/repositories/mongo-task.repository';
@@ -30,7 +29,7 @@ export class CommentsController {
     body: createCommentSchema,
   })
   async create(ctx: RequestContext) {
-    const user = getUser(ctx);
+    const user = ctx.get('user');
     const result = await this.createCommentUseCase.execute(ctx.params.taskId, user.id, ctx.body);
     ctx.created(successResponse(result));
   }
@@ -53,7 +52,7 @@ export class CommentsController {
     body: updateCommentSchema,
   })
   async update(ctx: RequestContext) {
-    const user = getUser(ctx);
+    const user = ctx.get('user');
     const comment = await this.commentRepo.findById(ctx.params.commentId);
     if (!comment) throw HttpException.notFound(ErrorCode.COMMENT_NOT_FOUND);
     if (comment.authorId.toString() !== user.id) throw HttpException.forbidden(ErrorCode.NOT_COMMENT_AUTHOR);
@@ -67,7 +66,7 @@ export class CommentsController {
   @ApiResponse({ status: 404, description: 'Comment not found' })
   @Delete('/comments/:commentId', { params: z.object({ commentId: z.string() }) })
   async delete(ctx: RequestContext) {
-    const user = getUser(ctx);
+    const user = ctx.get('user');
     const comment = await this.commentRepo.findById(ctx.params.commentId);
     if (!comment) throw HttpException.notFound(ErrorCode.COMMENT_NOT_FOUND);
     if (comment.authorId.toString() !== user.id) throw HttpException.forbidden(ErrorCode.NOT_COMMENT_AUTHOR);

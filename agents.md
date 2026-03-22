@@ -63,7 +63,7 @@ src/
 │   │   ├── auth-bridge.middleware.ts   # JWT validation middleware (route-level)
 │   │   └── request-id.middleware.ts    # X-Request-Id header
 │   └── utils/
-│       └── auth.ts                 # getUser(ctx) helper -- reads from (ctx.req as any).user
+│       └── auth.ts                 # getUser(ctx) helper -- reads from ctx.get<AuthUser>('user')
 └── modules/
     ├── index.ts                    # Module registry (all modules exported as array)
     ├── auth/                       # Register, login, JWT refresh/rotation, logout
@@ -125,7 +125,7 @@ module/
 - **AuthAdapter is commented out** in `config/adapters.ts` -- using `authBridgeMiddleware` instead.
 - Every protected controller class must have `@Middleware(authBridgeMiddleware)`.
 - The auth module (`/auth`) does NOT use `authBridgeMiddleware` (public routes).
-- `getUser(ctx)` reads from `(ctx.req as any).user` -- NOT `ctx.get('user')` (see Issue #13 below).
+- `getUser(ctx)` reads from `ctx.get<AuthUser>('user')` — fixed in KickJS v1.2.5 (Issue #13 resolved).
 - JWT access tokens expire in 15m; refresh tokens in 7d (configurable via env).
 
 ### Pagination

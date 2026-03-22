@@ -1,16 +1,16 @@
 import type { AppModule, ModuleRoutes, Container } from '@forinda/kickjs-core';
-// Import processors so @Service() and @Job() decorators execute and register in DI
+// Side-effect imports ensure @Job() decorators populate the jobRegistry
+import './infrastructure/processors/email.processor';
+import './infrastructure/processors/notification.processor';
+import './infrastructure/processors/activity.processor';
+
 export class QueueModule implements AppModule {
   register(_container: Container): void {
-    // Processors are auto-registered via @Service() decorator.
-    // Imports above ensure decorator side-effects run during module loading.
-    // Force reference so tree-shaking doesn't remove them.
-    // void EmailProcessor;
-    // void NotificationProcessor;
-    // void ActivityProcessor;
+    // No manual registration needed — QueueAdapter v1.2.6+ auto-registers
+    // @Job classes in the container before resolving them.
   }
 
-  routes(): ModuleRoutes {
-    return { path: '/', router: undefined as any, controller: undefined as any };
+  routes(): ModuleRoutes | null {
+    return null;
   }
 }

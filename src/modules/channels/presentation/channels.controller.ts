@@ -5,7 +5,6 @@ import { z } from 'zod';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@forinda/kickjs-swagger';
 import { ErrorCode } from '@/shared/constants/error-codes';
 import { createChannelSchema } from '../application/dtos/create-channel.dto';
-import { getUser } from '@/shared/utils/auth';
 import { successResponse } from '@/shared/application/api-response.dto';
 import { workspaceMembershipGuard } from '@/shared/guards/workspace-membership.guard';
 import { channelMembershipGuard } from '@/shared/guards/channel-membership.guard';
@@ -29,7 +28,7 @@ export class ChannelsController {
   })
   @Middleware(workspaceMembershipGuard)
   async create(ctx: RequestContext) {
-    const user = getUser(ctx);
+    const user = ctx.get('user');
     const existing = await this.channelRepo.findByNameAndWorkspace(ctx.body.name, ctx.params.workspaceId);
     if (existing) throw HttpException.conflict(ErrorCode.CHANNEL_NAME_EXISTS);
     const channel = await this.channelRepo.create({

@@ -17,23 +17,5 @@ const envSchema = defineEnv((base) =>
   }),
 );
 
-const _env = loadEnv(envSchema);
-
-export const env = _env as {
-  PORT: number;
-  NODE_ENV: 'development' | 'production' | 'test';
-  LOG_LEVEL: string;
-  MONGODB_URI: string;
-  REDIS_URL: string;
-  JWT_SECRET: string;
-  JWT_REFRESH_SECRET: string;
-  JWT_ACCESS_EXPIRES_IN: string;
-  JWT_REFRESH_EXPIRES_IN: string;
-  RESEND_API_KEY: string;
-  MAIL_FROM_NAME: string;
-  MAIL_FROM_EMAIL: string;
-  APP_URL: string;
-  APP_NAME: string;
-};
-
+export const env = loadEnv(envSchema);
 export type Env = typeof env;

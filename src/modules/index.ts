@@ -12,8 +12,10 @@ import { NotificationsModule } from './notifications/notifications.module';
 import { ChannelsModule } from './channels/channels.module';
 import { MessagesModule } from './messages/messages.module';
 import { StatsModule } from './stats/stats.module';
+import { QueueModule } from './queue/queue.module';
 
 export const modules: AppModuleClass[] = [
+  QueueModule,
   AuthModule,
   UsersModule,
   WorkspacesModule,

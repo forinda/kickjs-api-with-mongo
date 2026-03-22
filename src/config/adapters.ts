@@ -14,7 +14,7 @@ import { TaskCronJobs } from '@/modules/cron/infrastructure/jobs/overdue-reminde
 import { DigestCronJobs } from '@/modules/cron/infrastructure/jobs/daily-digest.cron';
 import { CleanupCronJobs } from '@/modules/cron/infrastructure/jobs/token-cleanup.cron';
 import { PresenceCronJobs } from '@/modules/cron/infrastructure/jobs/presence-cleanup.cron';
-import { ProcessorRegistrarAdapter } from '@/shared/infrastructure/queue/processor-registrar.adapter';
+import { HealthCheckCronJobs } from '@/modules/cron/infrastructure/jobs/health-check.cron';
 
 const redisUrl = new URL(env.REDIS_URL);
 
@@ -37,22 +37,19 @@ const queueAdapter = new QueueAdapter({
 export const adapters = [
   new MongooseAdapter(env.MONGODB_URI),
   new RedisAdapter(env.REDIS_URL),
-  // AuthAdapter disabled — using authBridgeMiddleware for JWT validation instead.
-  // See framework-issues.md #9 — AuthAdapter's beforeRoutes phase can't resolve
-  // controllers, so @Public() never works and defaultPolicy controls everything.
-  // new AuthAdapter({
-  //   strategies: [
-  //     new JwtStrategy({
-  //       secret: env.JWT_SECRET,
-  //       mapPayload: (payload: any) => ({
-  //         id: payload.sub,
-  //         email: payload.email,
-  //         globalRole: payload.globalRole ?? 'user',
-  //       }),
-  //     }),
-  //   ],
-  //   defaultPolicy: 'open',
-  // }),
+  new AuthAdapter({
+    strategies: [
+      new JwtStrategy({
+        secret: env.JWT_SECRET,
+        mapPayload: (payload: any) => ({
+          id: payload.sub,
+          email: payload.email,
+          globalRole: payload.globalRole ?? 'user',
+        }),
+      }),
+    ],
+    defaultPolicy: 'protected',
+  }),
   wsAdapter,
   new MailerAdapter({
     provider: env.NODE_ENV === 'production'
@@ -60,10 +57,9 @@ export const adapters = [
       : new ConsoleProvider(),
     defaultFrom: { name: env.MAIL_FROM_NAME, address: env.MAIL_FROM_EMAIL },
   }),
-  new ProcessorRegistrarAdapter(),
   queueAdapter,
   new CronAdapter({
-    services: [TaskCronJobs, DigestCronJobs, CleanupCronJobs, PresenceCronJobs],
+    services: [TaskCronJobs, DigestCronJobs, CleanupCronJobs, PresenceCronJobs, HealthCheckCronJobs],
     enabled: true,
   }),
   new DevToolsAdapter({

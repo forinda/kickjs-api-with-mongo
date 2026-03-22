@@ -9,16 +9,16 @@ export interface AuthUser {
 
 /**
  * Get the authenticated user from the request.
- * Reads from req.user (set by authBridgeMiddleware).
+ * Reads from ctx metadata (set by authBridgeMiddleware via ctx.set('user')).
  *
- * NOTE: ctx.get('user') does NOT work across middleware → handler because
- * each gets a separate RequestContext with its own metadata Map.
- * req is the shared object across all contexts for a request.
+ * Since KickJS v1.2.5, ctx metadata is shared across all RequestContext
+ * instances for the same request, so ctx.get() works across middleware → handler.
  */
 export function getUser(ctx: RequestContext): AuthUser {
-  const user = (ctx.req as any).user as AuthUser | undefined;
+  const user = ctx.get<AuthUser>('user');
   if (!user) {
     throw HttpException.unauthorized('Authentication required');
   }
+
   return user;
 }

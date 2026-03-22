@@ -11,17 +11,18 @@ Each issue file maps to the GitHub issue templates at [kick-js/.github/ISSUE_TEM
 |---|---|---|---|---|---|
 | [KICK-001](./KICK-001.md) | `kick new` interactive prompt not scriptable | cli | Low | Open | — |
 | [KICK-002](./KICK-002.md) | Nodemailer peer dependency mismatch | mailer | Low | Open | — |
-| [KICK-003](./KICK-003.md) | Modules without routes crash Express | http | High | Open | — |
-| [KICK-004](./KICK-004.md) | `loadEnv()` returns loosely typed object | config | Medium | Open | — |
+| [KICK-003](./KICK-003.md) | Modules without routes crash Express | http | High | Released | v1.2.3 |
+| [KICK-004](./KICK-004.md) | `loadEnv()` returns loosely typed object | config | Medium | Released | v1.2.3 |
 | [KICK-005](./KICK-005.md) | QueueAdapter `queues` expects strings, docs show classes | queue | Medium | Open | — |
 | [KICK-006](./KICK-006.md) | Mongoose `OverwriteModelError` during HMR | http | High | Open | — |
 | [KICK-007](./KICK-007.md) | Route path doubling: module path + controller path | http | High | Open | — |
 | [KICK-008](./KICK-008.md) | Global middleware receives Express handler, not RequestContext | http | Medium | Open | — |
-| [KICK-009](./KICK-009.md) | `ctx.set()`/`ctx.get()` not shared between middleware and handler | http | Critical | Open | — |
-| [KICK-010](./KICK-010.md) | `@Public()` not respected — AuthAdapter resolveHandler fails | auth | Critical | Open | — |
+| [KICK-009](./KICK-009.md) | `ctx.set()`/`ctx.get()` not shared between middleware and handler | http | Critical | Released | v1.2.5 |
+| [KICK-010](./KICK-010.md) | `@Public()` not respected — AuthAdapter resolveHandler fails | auth | Critical | Released | v1.2.3 |
 | [KICK-011](./KICK-011.md) | `@Inject(TOKEN)` doesn't work as property decorator | core | Medium | Open | — |
 | [KICK-012](./KICK-012.md) | DevToolsAdapter `peerAdapters` lost on HMR rebuild | devtools | Low | Open | — |
-| [KICK-013](./KICK-013.md) | `@Job`/`@Service` classes lose DI binding on HMR | queue | Low | Open | — |
+| [KICK-013](./KICK-013.md) | `@Job`/`@Service` classes lose DI binding on HMR | queue | Low | Released | v1.2.6 |
+| [KICK-016](./KICK-016.md) | `@Service()` + `@Job()` classes not auto-registered in DI | queue, core | High | Released | v1.2.6 |
 
 ### Documentation Issues (`[Docs]:`)
 
@@ -34,6 +35,8 @@ Each issue file maps to the GitHub issue templates at [kick-js/.github/ISSUE_TEM
 | ID | Title | Package | Type | Status |
 |---|---|---|---|---|
 | [KICK-015](./KICK-015.md) | `kick readme` CLI command | cli | New CLI command | Open |
+| [KICK-017](./KICK-017.md) | `@Service()` classes should be auto-registered in DI container | core, queue | Enhancement | Released (partial) |
+| [KICK-018](./KICK-018.md) | Type-safe API client generation (tRPC-like) | cli, http, swagger | New feature | Open |
 
 ## Statuses
 - **Open** — Issue filed, not yet fixed in framework

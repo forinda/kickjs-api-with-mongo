@@ -79,17 +79,9 @@ Tracking issues, workarounds, and observations encountered while building with K
 - **Workaround**: Restart `kick dev` fully (not HMR) to get fresh adapter references. Or accept that queue/ws devtools only work after a cold start.
 - **Suggestion**: DevToolsAdapter should discover peer adapters from the app's adapter registry at request time rather than caching constructor references. E.g., `app.getAdapters().find(a => a.name === 'QueueAdapter')`.
 
-### 13. `ctx.set()`/`ctx.get()` metadata NOT shared between middleware and handler
-- **Description**: In `router-builder.ts`, each class/method middleware and the route handler each get a **separate** `new RequestContext(req, res, next)` instance. Since `RequestContext.metadata` is a private `new Map()` per instance, `ctx.set('key', value)` in a `@Middleware` handler is invisible to `ctx.get('key')` in the route handler.
-- **Impact**: Any data stored via `ctx.set()` in middleware (e.g., authenticated user, parsed tokens) cannot be retrieved via `ctx.get()` in the controller method. This makes the documented `ctx.set()`/`ctx.get()` pattern broken for the most common use case: passing data from middleware to handlers.
-- **Workaround**: Store shared per-request data on `req` directly (`(ctx.req as any).user = user`). Create a helper function like `getUser(ctx)` that reads from `(ctx.req as any).user` to keep it clean.
-- **Suggestion**: Either share a single `RequestContext` instance across middleware and handler for the same request, or store the metadata Map on `req` itself so all `RequestContext` wrappers for the same request read/write to the same Map. E.g.:
-  ```typescript
-  private get metadata(): Map<string, any> {
-    if (!(this.req as any).__ctxMeta) (this.req as any).__ctxMeta = new Map();
-    return (this.req as any).__ctxMeta;
-  }
-  ```
+### 13. ~~`ctx.set()`/`ctx.get()` metadata NOT shared between middleware and handler~~ ✅ FIXED in v1.2.5
+- **Status**: Resolved in KickJS v1.2.5. The metadata Map is now stored on `req` and shared across all `RequestContext` instances for the same request. `ctx.set()` in middleware is visible to `ctx.get()` in the handler.
+- **Migration**: Use `ctx.get<T>('key')` / `ctx.set('key', value)` directly — no need for `(ctx.req as any)` workarounds.
 
 ## Feature Requests
 
@@ -277,11 +269,11 @@ KickJS uses Vite HMR via `kick dev`. Understanding what survives a hot reload vs
 | DevTools peer adapter refs | Old DevTools holds old references | `/_debug/queues` shows "not found" |
 
 ### Best practices
-1. **Use `req` for shared per-request data** — `ctx.set()`/`ctx.get()` don't work across middleware → handler (see issue #13). Use a helper:
+1. **Use `ctx.set()`/`ctx.get()` for shared per-request data** — fixed in KickJS v1.2.5 (issue #13 resolved). Use a helper:
    ```typescript
    // shared/utils/auth.ts
    export function getUser(ctx: RequestContext): AuthUser {
-     const user = (ctx.req as any).user;
+     const user = ctx.get<AuthUser>('user');
      if (!user) throw HttpException.unauthorized('Authentication required');
      return user;
    }

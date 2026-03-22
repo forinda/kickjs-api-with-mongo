@@ -9,5 +9,6 @@ bootstrap({
   apiPrefix: '/api',
   defaultVersion: 1,
   middleware,
+  
   adapters,
 });

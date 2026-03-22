@@ -4,7 +4,6 @@ import { HttpException } from '@forinda/kickjs-core';
 import { z } from 'zod';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@forinda/kickjs-swagger';
 import { ErrorCode } from '@/shared/constants/error-codes';
-import { getUser } from '@/shared/utils/auth';
 import { successResponse } from '@/shared/application/api-response.dto';
 import { MongoAttachmentRepository } from '../infrastructure/repositories/mongo-attachment.repository';
 import { MongoTaskRepository } from '@/modules/tasks/infrastructure/repositories/mongo-task.repository';
@@ -37,7 +36,7 @@ export class AttachmentsController {
       return ctx.badRequest('No file uploaded. Use field name "file".');
     }
 
-    const user = getUser(ctx);
+    const user = ctx.get('user');
 
     const base64Data = file.buffer.toString('base64');
 

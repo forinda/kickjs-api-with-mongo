@@ -4,7 +4,6 @@ import { z } from 'zod';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@forinda/kickjs-swagger';
 import { NOTIFICATION_QUERY_CONFIG } from '@/shared/constants/query-configs';
 
-import { getUser } from '@/shared/utils/auth';
 import { successResponse } from '@/shared/application/api-response.dto';
 import { MongoNotificationRepository } from '../infrastructure/repositories/mongo-notification.repository';
 import { authBridgeMiddleware } from '@/shared/presentation/middlewares/auth-bridge.middleware';
@@ -22,7 +21,7 @@ export class NotificationsController {
   @Get('/')
   @ApiQueryParams(NOTIFICATION_QUERY_CONFIG)
   async list(ctx: RequestContext) {
-    const user = getUser(ctx);
+    const user = ctx.get('user');
     await ctx.paginate(
       (parsed) => this.notificationRepo.findByRecipient(user.id, parsed),
       NOTIFICATION_QUERY_CONFIG,
@@ -43,7 +42,7 @@ export class NotificationsController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @Post('/read-all')
   async markAllRead(ctx: RequestContext) {
-    const user = getUser(ctx);
+    const user = ctx.get('user');
     await this.notificationRepo.markAllAsRead(user.id);
     ctx.json(successResponse(null, 'All marked as read'));
   }
@@ -53,7 +52,7 @@ export class NotificationsController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @Get('/unread-count')
   async unreadCount(ctx: RequestContext) {
-    const user = getUser(ctx);
+    const user = ctx.get('user');
     const count = await this.notificationRepo.countUnread(user.id);
     ctx.json(successResponse({ count }));
   }

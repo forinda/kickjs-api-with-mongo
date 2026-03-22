@@ -1,6 +1,6 @@
 {
   "name": "vibed",
-  "version": "1.2.2",
+  "version": "1.2.6",
   "type": "module",
   "scripts": {
     "dev": "kick dev",
@@ -14,16 +14,16 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
-    "@forinda/kickjs-auth": "^1.2.2",
-    "@forinda/kickjs-config": "^1.2.2",
-    "@forinda/kickjs-core": "^1.2.2",
-    "@forinda/kickjs-cron": "^1.2.2",
-    "@forinda/kickjs-devtools": "^1.2.2",
-    "@forinda/kickjs-http": "^1.2.2",
-    "@forinda/kickjs-mailer": "^1.2.2",
-    "@forinda/kickjs-queue": "^1.2.2",
-    "@forinda/kickjs-swagger": "^1.2.2",
-    "@forinda/kickjs-ws": "^1.2.2",
+    "@forinda/kickjs-auth": "^1.2.6",
+    "@forinda/kickjs-config": "^1.2.6",
+    "@forinda/kickjs-core": "^1.2.6",
+    "@forinda/kickjs-cron": "^1.2.6",
+    "@forinda/kickjs-devtools": "^1.2.6",
+    "@forinda/kickjs-http": "^1.2.6",
+    "@forinda/kickjs-mailer": "^1.2.6",
+    "@forinda/kickjs-queue": "^1.2.6",
+    "@forinda/kickjs-swagger": "^1.2.6",
+    "@forinda/kickjs-ws": "^1.2.6",
     "bcryptjs": "^3.0.3",
     "bullmq": "^5.71.0",
     "cors": "^2.8.6",
@@ -44,7 +44,7 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@forinda/kickjs-cli": "^1.2.2",
+    "@forinda/kickjs-cli": "^1.2.6",
     "@swc/core": "^1.7.28",
     "@types/bcryptjs": "^3.0.0",
     "@types/cors": "^2.8.19",
