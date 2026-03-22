@@ -7,9 +7,11 @@ import { successResponse } from '@/shared/application/api-response.dto';
 import { workspaceMembershipGuard } from '@/shared/guards/workspace-membership.guard';
 import { projectAccessGuard } from '@/shared/guards/project-access.guard';
 import { MongoActivityRepository } from '../infrastructure/repositories/mongo-activity.repository';
+import { authBridgeMiddleware } from '@/shared/presentation/middlewares/auth-bridge.middleware';
 
 @ApiTags('Activity')
 @ApiBearerAuth()
+@Middleware(authBridgeMiddleware)
 @Controller()
 export class ActivityController {
   @Autowired() private activityRepo!: MongoActivityRepository;

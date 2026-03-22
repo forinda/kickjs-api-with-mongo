@@ -46,3 +46,17 @@ export const PROJECT_QUERY_CONFIG: ApiQueryParamsConfig = {
   sortable: ['name', 'createdAt', 'key'],
   searchable: ['name', 'description', 'key'],
 };
+
+export const COMMENT_QUERY_CONFIG: ApiQueryParamsConfig = {
+  sortable: ['createdAt'],
+};
+
+export const ATTACHMENT_QUERY_CONFIG: ApiQueryParamsConfig = {
+  sortable: ['createdAt', 'fileName'],
+  searchable: ['fileName'],
+};
+
+export const MEMBER_QUERY_CONFIG: ApiQueryParamsConfig = {
+  filterable: ['role'],
+  sortable: ['joinedAt'],
+};

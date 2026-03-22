@@ -7,6 +7,16 @@ export default defineConfig({
 
   commands: [
     {
+      name: 'seed',
+      description: 'Populate database with sample data',
+      steps: 'npx vite-node src/db/seed.ts',
+    },
+    {
+      name: 'db:reset',
+      description: 'Drop database and reseed',
+      steps: ['npx vite-node src/db/reset.ts', 'npx vite-node src/db/seed.ts'],
+    },
+    {
       name: 'test',
       description: 'Run tests with Vitest',
       steps: 'npx vitest run',

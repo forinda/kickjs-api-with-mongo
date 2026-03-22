@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Delete, Middleware, FileUpload, Autowired } from '@forinda/kickjs-core';
+import { Controller, Get, Post, Delete, Middleware, FileUpload, Autowired, ApiQueryParams } from '@forinda/kickjs-core';
 import type { RequestContext } from '@forinda/kickjs-http';
 import { HttpException } from '@forinda/kickjs-core';
 import { z } from 'zod';
@@ -8,6 +8,7 @@ import { successResponse } from '@/shared/application/api-response.dto';
 import { MongoAttachmentRepository } from '../infrastructure/repositories/mongo-attachment.repository';
 import { MongoTaskRepository } from '@/modules/tasks/infrastructure/repositories/mongo-task.repository';
 import { authBridgeMiddleware } from '@/shared/presentation/middlewares/auth-bridge.middleware';
+import { ATTACHMENT_QUERY_CONFIG } from '@/shared/constants/query-configs';
 
 @ApiTags('Attachments')
 @ApiBearerAuth()
@@ -64,18 +65,12 @@ export class AttachmentsController {
   @ApiResponse({ status: 200, description: 'List of attachments returned' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @Get('/tasks/:taskId/attachments', { params: z.object({ taskId: z.string() }) })
+  @ApiQueryParams(ATTACHMENT_QUERY_CONFIG)
   async list(ctx: RequestContext) {
-    const attachments = await this.attachmentRepo.findByTask(ctx.params.taskId);
-    const result = attachments.map((a) => ({
-      id: a._id.toString(),
-      taskId: a.taskId.toString(),
-      uploadedById: a.uploadedById.toString(),
-      fileName: a.fileName,
-      fileSize: a.fileSize,
-      mimeType: a.mimeType,
-      createdAt: a.createdAt,
-    }));
-    ctx.json(successResponse(result));
+    await ctx.paginate(
+      (parsed) => this.attachmentRepo.findPaginated(parsed, { taskId: ctx.params.taskId }),
+      ATTACHMENT_QUERY_CONFIG,
+    );
   }
 
   @ApiOperation({ summary: 'Get a single attachment by ID' })

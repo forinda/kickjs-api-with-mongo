@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Delete, Middleware, Autowired } from '@forinda/kickjs-core';
+import { Controller, Get, Post, Patch, Delete, Middleware, Autowired, ApiQueryParams } from '@forinda/kickjs-core';
 import type { RequestContext } from '@forinda/kickjs-http';
 import { HttpException } from '@forinda/kickjs-core';
 import { z } from 'zod';
@@ -11,6 +11,7 @@ import { successResponse } from '@/shared/application/api-response.dto';
 import { MongoCommentRepository } from '../infrastructure/repositories/mongo-comment.repository';
 import { MongoTaskRepository } from '@/modules/tasks/infrastructure/repositories/mongo-task.repository';
 import { authBridgeMiddleware } from '@/shared/presentation/middlewares/auth-bridge.middleware';
+import { COMMENT_QUERY_CONFIG } from '@/shared/constants/query-configs';
 
 @ApiTags('Comments')
 @ApiBearerAuth()
@@ -38,9 +39,12 @@ export class CommentsController {
   @ApiResponse({ status: 200, description: 'List of comments returned' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @Get('/tasks/:taskId/comments', { params: z.object({ taskId: z.string() }) })
+  @ApiQueryParams(COMMENT_QUERY_CONFIG)
   async list(ctx: RequestContext) {
-    const comments = await this.commentRepo.findByTask(ctx.params.taskId);
-    ctx.json(successResponse(comments));
+    await ctx.paginate(
+      (parsed) => this.commentRepo.findPaginated(parsed, { taskId: ctx.params.taskId }),
+      COMMENT_QUERY_CONFIG,
+    );
   }
 
   @ApiOperation({ summary: 'Update a comment' })

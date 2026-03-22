@@ -6,9 +6,11 @@ import { workspaceMembershipGuard } from '@/shared/guards/workspace-membership.g
 import { projectAccessGuard } from '@/shared/guards/project-access.guard';
 import { MongoTaskRepository } from '@/modules/tasks/infrastructure/repositories/mongo-task.repository';
 import { getOnlineUsers } from '@/modules/messages/presentation/chat.ws-controller';
+import { authBridgeMiddleware } from '@/shared/presentation/middlewares/auth-bridge.middleware';
 
 @ApiTags('Stats')
 @ApiBearerAuth()
+@Middleware(authBridgeMiddleware)
 @Controller()
 export class StatsController {
   @Autowired() private taskRepo!: MongoTaskRepository;

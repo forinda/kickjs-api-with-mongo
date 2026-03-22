@@ -1,10 +1,10 @@
 # CLAUDE.md — Project Context for Claude Code
 
 ## Project
-Vibed — Jira-like task management backend built with KickJS v1.2.6 (decorator-driven Node.js framework on Express 5 + TypeScript).
+Vibed — Jira-like task management backend built with KickJS v1.2.7 (decorator-driven Node.js framework on Express 5 + TypeScript).
 
 ## Tech Stack
-- **Framework**: KickJS v1.2.6 — `@forinda/kickjs-*` packages
+- **Framework**: KickJS v1.2.7 — `@forinda/kickjs-*` packages
 - **Database**: MongoDB via Mongoose
 - **Auth**: JWT (custom `authBridgeMiddleware`, NOT the AuthAdapter's route-level auth)
 - **Email**: Resend (prod) / ConsoleProvider (dev) via `@forinda/kickjs-mailer`
@@ -31,7 +31,7 @@ Vibed — Jira-like task management backend built with KickJS v1.2.6 (decorator-
 - AuthAdapter is `defaultPolicy: 'open'` — it does NOT protect routes
 - `authBridgeMiddleware` handles JWT validation — apply via `@Middleware(authBridgeMiddleware)` on protected controllers
 - Auth controller (register/login/refresh) has NO `authBridgeMiddleware`
-- Read user with `getUser(ctx)` from `@/shared/utils/auth` — uses `ctx.get<AuthUser>('user')` internally (fixed in KickJS v1.2.6)
+- Read user with `getUser(ctx)` from `@/shared/utils/auth` — uses `ctx.get<AuthUser>('user')` internally (fixed in KickJS v1.2.7)
 
 ### DI Injection
 - Controllers: `@Autowired()` for property injection (resolves by class type)

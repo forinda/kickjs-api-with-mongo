@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Delete, Middleware, Autowired } from '@forinda/kickjs-core';
+import { Controller, Get, Post, Patch, Delete, Middleware, Autowired, ApiQueryParams } from '@forinda/kickjs-core';
 import type { RequestContext } from '@forinda/kickjs-http';
 import { HttpException } from '@forinda/kickjs-core';
 import { z } from 'zod';
@@ -9,9 +9,12 @@ import { updateLabelSchema } from '../application/dtos/update-label.dto';
 import { successResponse } from '@/shared/application/api-response.dto';
 import { workspaceMembershipGuard } from '@/shared/guards/workspace-membership.guard';
 import { MongoLabelRepository } from '../infrastructure/repositories/mongo-label.repository';
+import { LABEL_QUERY_CONFIG } from '@/shared/constants/query-configs';
+import { authBridgeMiddleware } from '@/shared/presentation/middlewares/auth-bridge.middleware';
 
 @ApiTags('Labels')
 @ApiBearerAuth()
+@Middleware(authBridgeMiddleware)
 @Controller()
 export class LabelsController {
   @Autowired() private labelRepo!: MongoLabelRepository;
@@ -39,9 +42,12 @@ export class LabelsController {
   @ApiResponse({ status: 200, description: 'List of labels returned successfully' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden - not a workspace member' })
+  @ApiQueryParams(LABEL_QUERY_CONFIG)
   async list(ctx: RequestContext) {
-    const labels = await this.labelRepo.findByWorkspace(ctx.params.workspaceId);
-    ctx.json(successResponse(labels));
+    await ctx.paginate(
+      (parsed) => this.labelRepo.findPaginated(parsed, { workspaceId: ctx.params.workspaceId }),
+      LABEL_QUERY_CONFIG,
+    );
   }
 
   @Patch('/labels/:labelId', { params: z.object({ labelId: z.string() }), body: updateLabelSchema })

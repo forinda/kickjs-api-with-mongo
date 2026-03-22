@@ -2,9 +2,21 @@ import { Repository } from '@forinda/kickjs-core';
 import type { ICommentRepository } from '../../domain/repositories/comment.repository';
 import type { CommentEntity } from '../../domain/entities/comment.entity';
 import { CommentModel } from '../schemas/comment.schema';
+import { buildMongoFilter, buildMongoSort, buildMongoSearch } from '@/shared/infrastructure/database/query-helpers';
 
 @Repository()
 export class MongoCommentRepository implements ICommentRepository {
+  async findPaginated(parsed: any, extraFilter: Record<string, any> = {}): Promise<{ data: any[]; total: number }> {
+    const { filters = [], sort = [], pagination = { page: 1, limit: 20, offset: 0 }, search = '' } = parsed;
+    const mongoFilter = { ...extraFilter, ...buildMongoFilter(filters), ...buildMongoSearch(search) };
+    const mongoSort = buildMongoSort(sort);
+    const [data, total] = await Promise.all([
+      CommentModel.find(mongoFilter).sort(mongoSort).skip(pagination.offset).limit(pagination.limit).lean(),
+      CommentModel.countDocuments(mongoFilter),
+    ]);
+    return { data: data as any[], total };
+  }
+
   async findById(id: string): Promise<CommentEntity | null> {
     return CommentModel.findById(id).lean() as any;
   }

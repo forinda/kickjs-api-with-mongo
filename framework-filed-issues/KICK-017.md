@@ -1,9 +1,9 @@
 # KICK-017: `@Service()` decorated classes should be auto-registered in DI container
 
-- **Status**: Released (partial — Option B implemented)
+- **Status**: Released (fully resolved)
 - **Severity**: Medium
 - **Found in**: v1.2.5
-- **Fixed in**: v1.2.6
+- **Fixed in**: v1.2.6 (Option B: QueueAdapter), v1.2.7 (Option A: Container auto-registration)
 - **Component**: core, queue
 - **Type**: Feature Request
 

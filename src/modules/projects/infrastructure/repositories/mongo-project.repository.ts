@@ -2,9 +2,21 @@ import { Repository } from '@forinda/kickjs-core';
 import type { IProjectRepository } from '../../domain/repositories/project.repository';
 import type { ProjectEntity } from '../../domain/entities/project.entity';
 import { ProjectModel } from '../schemas/project.schema';
+import { buildMongoFilter, buildMongoSort, buildMongoSearch } from '@/shared/infrastructure/database/query-helpers';
 
 @Repository()
 export class MongoProjectRepository implements IProjectRepository {
+  async findPaginated(parsed: any, extraFilter: Record<string, any> = {}): Promise<{ data: any[]; total: number }> {
+    const { filters = [], sort = [], pagination = { page: 1, limit: 20, offset: 0 }, search = '' } = parsed;
+    const mongoFilter = { ...extraFilter, ...buildMongoFilter(filters), ...buildMongoSearch(search) };
+    const mongoSort = buildMongoSort(sort);
+    const [data, total] = await Promise.all([
+      ProjectModel.find(mongoFilter).sort(mongoSort).skip(pagination.offset).limit(pagination.limit).lean(),
+      ProjectModel.countDocuments(mongoFilter),
+    ]);
+    return { data: data as any[], total };
+  }
+
   async findById(id: string): Promise<ProjectEntity | null> {
     return ProjectModel.findById(id).lean() as any;
   }

@@ -9,35 +9,35 @@ importers:
   .:
     dependencies:
       '@forinda/kickjs-auth':
-        specifier: ^1.2.6
-        version: 1.2.6(jsonwebtoken@9.0.3)
+        specifier: ^1.2.7
+        version: 1.2.7(jsonwebtoken@9.0.3)
       '@forinda/kickjs-config':
-        specifier: ^1.2.6
-        version: 1.2.6(vite@7.3.1(@types/node@24.12.0))
+        specifier: ^1.2.7
+        version: 1.2.7(vite@7.3.1(@types/node@24.12.0))
       '@forinda/kickjs-core':
-        specifier: ^1.2.6
-        version: 1.2.6
+        specifier: ^1.2.7
+        version: 1.2.7
       '@forinda/kickjs-cron':
-        specifier: ^1.2.6
-        version: 1.2.6(croner@10.0.1)
+        specifier: ^1.2.7
+        version: 1.2.7(croner@10.0.1)
       '@forinda/kickjs-devtools':
-        specifier: ^1.2.6
-        version: 1.2.6(express@5.2.1)
+        specifier: ^1.2.7
+        version: 1.2.7(express@5.2.1)
       '@forinda/kickjs-http':
-        specifier: ^1.2.6
-        version: 1.2.6(express@5.2.1)
+        specifier: ^1.2.7
+        version: 1.2.7(express@5.2.1)
       '@forinda/kickjs-mailer':
-        specifier: ^1.2.6
-        version: 1.2.6(nodemailer@8.0.3)
+        specifier: ^1.2.7
+        version: 1.2.7(nodemailer@8.0.3)
       '@forinda/kickjs-queue':
-        specifier: ^1.2.6
-        version: 1.2.6(bullmq@5.71.0)(ioredis@5.10.1)
+        specifier: ^1.2.7
+        version: 1.2.7(bullmq@5.71.0)(ioredis@5.10.1)
       '@forinda/kickjs-swagger':
-        specifier: ^1.2.6
-        version: 1.2.6(express@5.2.1)(zod@4.3.6)
+        specifier: ^1.2.7
+        version: 1.2.7(express@5.2.1)(zod@4.3.6)
       '@forinda/kickjs-ws':
-        specifier: ^1.2.6
-        version: 1.2.6
+        specifier: ^1.2.7
+        version: 1.2.7
       bcryptjs:
         specifier: ^3.0.3
         version: 3.0.3
@@ -94,8 +94,8 @@ importers:
         version: 4.3.6
     devDependencies:
       '@forinda/kickjs-cli':
-        specifier: ^1.2.6
-        version: 1.2.6
+        specifier: ^1.2.7
+        version: 1.2.7
       '@swc/core':
         specifier: ^1.7.28
         version: 1.15.18
@@ -297,8 +297,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@forinda/kickjs-auth@1.2.6':
-    resolution: {integrity: sha512-TTUO6jhT+UyAo52c5lxxXZkn3ECigYUjQxcDYtIvZQbZ/Pv/zFELJPrUV+3FS5ps8rH7vm2fU5R6IXFAE8Wzag==}
+  '@forinda/kickjs-auth@1.2.7':
+    resolution: {integrity: sha512-ktEmPDFEKbdTIuTr2BNdsW4qxTKThWLiA6dlqGFWg3y99CZAxL2ztHeqmvSQ/DQL0SK3ruW8j6VdUdtIkYGMBA==}
     engines: {node: '>=20.0'}
     peerDependencies:
       jsonwebtoken: ^9.0.0
@@ -306,13 +306,13 @@ packages:
       jsonwebtoken:
         optional: true
 
-  '@forinda/kickjs-cli@1.2.6':
-    resolution: {integrity: sha512-WN4G+S6DdTwakCDfudSmy+hc4BrXDC6LdCfkzXwr/X98M903YxXkLAfRkJpo6Z2gFTzxsI3JHCGgGKurpC0rsA==}
+  '@forinda/kickjs-cli@1.2.7':
+    resolution: {integrity: sha512-VXTmuskp5ZrJNE4gvtaKB085DzRKc3pEdfrP9Y1ExQCxTV9yMRPi/8l985B6a4MeNZ5PuYCsQdWg4Q+bLWQc5w==}
     engines: {node: '>=20.0'}
     hasBin: true
 
-  '@forinda/kickjs-config@1.2.6':
-    resolution: {integrity: sha512-pw132V6bCzfysPcD1LBO+V6JfypJG4MwECF832oVM0UVx+jbpD9Ed5XF9veaRAds1iyeQ0BKB6ozHkny//VhGQ==}
+  '@forinda/kickjs-config@1.2.7':
+    resolution: {integrity: sha512-wL0ZZHHxesSqr7D21wBpl2jgamjPRc34CAREcZ5g0cNmYV6UlVMmHy5lyOGKGApT0glqxex2vSess7d8LBu1EA==}
     engines: {node: '>=20.0'}
     peerDependencies:
       vite: '>=5.0.0'
@@ -320,12 +320,12 @@ packages:
       vite:
         optional: true
 
-  '@forinda/kickjs-core@1.2.6':
-    resolution: {integrity: sha512-0abxqn1Unqu1aP3uPqsEyUmUYUrVdGuRgzWdFZhb6bF1L7HpvCALtPspS5+DNAVkSiHvstpetNpFSsHwPLh7GQ==}
+  '@forinda/kickjs-core@1.2.7':
+    resolution: {integrity: sha512-L+x9odmvGEzpPSRQbshLxxBFPxMN7SpPCyujZRIGnXsn+6qQqZ/Ifzx794nB5z9poG8Q0j30SpVbR3ozjcB+jQ==}
     engines: {node: '>=20.0'}
 
-  '@forinda/kickjs-cron@1.2.6':
-    resolution: {integrity: sha512-51n4dC4CDp5InSk/Bbolh76QI50ZvOXcBR5BpR0a7SM4ikvUanQ9KeAAcESMyCeYWWSFps9yEsIVKCJBygNz6Q==}
+  '@forinda/kickjs-cron@1.2.7':
+    resolution: {integrity: sha512-BqUyDMAimXEzeS4ZdVVo/BE9ftwEWHGzkP+sqiqgyVy51j/ol+UVeQ+cBVU/U5VzVmWKgykawkROG0f1+eYAvw==}
     engines: {node: '>=20.0'}
     peerDependencies:
       croner: ^9.0.0 || ^10.0.0
@@ -333,20 +333,20 @@ packages:
       croner:
         optional: true
 
-  '@forinda/kickjs-devtools@1.2.6':
-    resolution: {integrity: sha512-cKOmkmYD1X3l0El9tHA8LUar/JnL2ZycdkB1P2+lmz0iR7wSTL0ZM6E8plsbwlAWrABu14G32OsKqGim3q491w==}
+  '@forinda/kickjs-devtools@1.2.7':
+    resolution: {integrity: sha512-0omJQx+S04DwKFKFgfqIPiGAcpuO8kpC3TzM8e/clBKtH1zoIjsKgha8hTBVXAgm5sGK6V9VVDQwB14tGqDN0Q==}
     engines: {node: '>=20.0'}
     peerDependencies:
       express: ^5.1.0
 
-  '@forinda/kickjs-http@1.2.6':
-    resolution: {integrity: sha512-91A0uGyl9uBApiRwKsNClEiUMVYuqn7z/3usUj4lz9LB8loJUSVWNJPbBV3HxUTHVLwdC5tjGr/ih0sg6sdmwA==}
+  '@forinda/kickjs-http@1.2.7':
+    resolution: {integrity: sha512-HRws/3b9ot+i0Bv6m3bL28Ja1ibRO76GOPz4PdpG9LWvZxcBwVO8sgxhbJ+USTGqdlueoA2q4tO4PXy8gnSD9w==}
     engines: {node: '>=20.0'}
     peerDependencies:
       express: ^5.1.0
 
-  '@forinda/kickjs-mailer@1.2.6':
-    resolution: {integrity: sha512-Rab5SljLRyhPhCht51nggs4BBGm6K7nT5Yf6VYSrMoIDhR2wRqvlkQRY6aCrUpPAUmkIz/C5f5wobAAHzDah/Q==}
+  '@forinda/kickjs-mailer@1.2.7':
+    resolution: {integrity: sha512-/20tedhcXJfQgj/srSlTnDFfLMfJTJXTG1R8WoROiWZqqr3mGM/wUveLudtioLuDlI6Gbw2tXTXYHfW8pd5sig==}
     engines: {node: '>=20.0'}
     peerDependencies:
       nodemailer: '>=6.0.0'
@@ -354,15 +354,15 @@ packages:
       nodemailer:
         optional: true
 
-  '@forinda/kickjs-queue@1.2.6':
-    resolution: {integrity: sha512-3FiFmaU8jcbASl5Qqef3hj+Lemw+VKX9AXJkgIt4PxoS+RSbBW3idghBIQVtkBzuIsYblVKRrLCTcQwnqTElMw==}
+  '@forinda/kickjs-queue@1.2.7':
+    resolution: {integrity: sha512-LSHvIct0HLyvOcVf85WsJ20OrPRG6AHcdiDS1h3mVpBTfmP6xQakL/uUacMs7p29RYF4jHgddnPRAT4pNnpruQ==}
     engines: {node: '>=20.0'}
     peerDependencies:
       bullmq: '>=5.0.0'
       ioredis: '>=5.0.0'
 
-  '@forinda/kickjs-swagger@1.2.6':
-    resolution: {integrity: sha512-vT70I3/xNCyhZEIlLYquHN9/ZDjAuMkvy5a0SGzb/DyeSHBMov1BeM1mxkWIiOl5ckkjLME/dD6rMVug1pnLqg==}
+  '@forinda/kickjs-swagger@1.2.7':
+    resolution: {integrity: sha512-BnPm08rh0pg3jUXheAnPN39+MgNoPrMu4wQkVnl8qYRJ48gi/lh6UpdRIhEPeWFKZN2SNeF2oBD3YH5HwzdK5Q==}
     engines: {node: '>=20.0'}
     peerDependencies:
       express: ^5.1.0
@@ -371,8 +371,8 @@ packages:
       zod:
         optional: true
 
-  '@forinda/kickjs-ws@1.2.6':
-    resolution: {integrity: sha512-T9JZoGc1sQTAMCUv/DHswWY9o4P/XRMBM0TLSN826ANG9l8dfxjjAeAdgcgZ5leqXUCkVwYWPdoz+3WuOscmqA==}
+  '@forinda/kickjs-ws@1.2.7':
+    resolution: {integrity: sha512-m9tqTgbAXxCNfFhrGrYvP1mPoJdckFS7speWoUGp0p3HtQcHKIpDbuHcmPQ+mV+Gn86s+rPUCIXLhu9mqpVTXA==}
     engines: {node: '>=20.0'}
 
   '@ioredis/commands@1.5.0':
@@ -1828,77 +1828,77 @@ snapshots:
   '@esbuild/win32-x64@0.27.4':
     optional: true
 
-  '@forinda/kickjs-auth@1.2.6(jsonwebtoken@9.0.3)':
+  '@forinda/kickjs-auth@1.2.7(jsonwebtoken@9.0.3)':
     dependencies:
-      '@forinda/kickjs-core': 1.2.6
+      '@forinda/kickjs-core': 1.2.7
       reflect-metadata: 0.2.2
     optionalDependencies:
       jsonwebtoken: 9.0.3
 
-  '@forinda/kickjs-cli@1.2.6':
+  '@forinda/kickjs-cli@1.2.7':
     dependencies:
       commander: 13.1.0
 
-  '@forinda/kickjs-config@1.2.6(vite@7.3.1(@types/node@24.12.0))':
+  '@forinda/kickjs-config@1.2.7(vite@7.3.1(@types/node@24.12.0))':
     dependencies:
-      '@forinda/kickjs-core': 1.2.6
+      '@forinda/kickjs-core': 1.2.7
       dotenv: 17.3.1
       zod: 4.3.6
     optionalDependencies:
       vite: 7.3.1(@types/node@24.12.0)
 
-  '@forinda/kickjs-core@1.2.6':
+  '@forinda/kickjs-core@1.2.7':
     dependencies:
       pino: 10.3.1
       pino-pretty: 13.1.3
       reflect-metadata: 0.2.2
 
-  '@forinda/kickjs-cron@1.2.6(croner@10.0.1)':
+  '@forinda/kickjs-cron@1.2.7(croner@10.0.1)':
     dependencies:
-      '@forinda/kickjs-core': 1.2.6
+      '@forinda/kickjs-core': 1.2.7
       reflect-metadata: 0.2.2
     optionalDependencies:
       croner: 10.0.1
 
-  '@forinda/kickjs-devtools@1.2.6(express@5.2.1)':
+  '@forinda/kickjs-devtools@1.2.7(express@5.2.1)':
     dependencies:
-      '@forinda/kickjs-core': 1.2.6
+      '@forinda/kickjs-core': 1.2.7
       express: 5.2.1
       reflect-metadata: 0.2.2
 
-  '@forinda/kickjs-http@1.2.6(express@5.2.1)':
+  '@forinda/kickjs-http@1.2.7(express@5.2.1)':
     dependencies:
-      '@forinda/kickjs-core': 1.2.6
+      '@forinda/kickjs-core': 1.2.7
       cookie-parser: 1.4.7
       express: 5.2.1
       multer: 2.1.1
       reflect-metadata: 0.2.2
 
-  '@forinda/kickjs-mailer@1.2.6(nodemailer@8.0.3)':
+  '@forinda/kickjs-mailer@1.2.7(nodemailer@8.0.3)':
     dependencies:
-      '@forinda/kickjs-core': 1.2.6
+      '@forinda/kickjs-core': 1.2.7
       reflect-metadata: 0.2.2
     optionalDependencies:
       nodemailer: 8.0.3
 
-  '@forinda/kickjs-queue@1.2.6(bullmq@5.71.0)(ioredis@5.10.1)':
+  '@forinda/kickjs-queue@1.2.7(bullmq@5.71.0)(ioredis@5.10.1)':
     dependencies:
-      '@forinda/kickjs-core': 1.2.6
+      '@forinda/kickjs-core': 1.2.7
       bullmq: 5.71.0
       ioredis: 5.10.1
       reflect-metadata: 0.2.2
 
-  '@forinda/kickjs-swagger@1.2.6(express@5.2.1)(zod@4.3.6)':
+  '@forinda/kickjs-swagger@1.2.7(express@5.2.1)(zod@4.3.6)':
     dependencies:
-      '@forinda/kickjs-core': 1.2.6
+      '@forinda/kickjs-core': 1.2.7
       express: 5.2.1
       reflect-metadata: 0.2.2
     optionalDependencies:
       zod: 4.3.6
 
-  '@forinda/kickjs-ws@1.2.6':
+  '@forinda/kickjs-ws@1.2.7':
     dependencies:
-      '@forinda/kickjs-core': 1.2.6
+      '@forinda/kickjs-core': 1.2.7
       reflect-metadata: 0.2.2
       ws: 8.20.0
     transitivePeerDependencies:

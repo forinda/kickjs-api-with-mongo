@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Delete, Middleware, Autowired } from '@forinda/kickjs-core';
+import { Controller, Get, Post, Patch, Delete, Middleware, Autowired, ApiQueryParams } from '@forinda/kickjs-core';
 import type { RequestContext } from '@forinda/kickjs-http';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@forinda/kickjs-swagger';
 import { z } from 'zod';
@@ -18,6 +18,9 @@ import { LeaveWorkspaceUseCase } from '../application/use-cases/leave-workspace.
 import { successResponse } from '@/shared/application/api-response.dto';
 import { workspaceMembershipGuard, requireWorkspaceRole } from '@/shared/guards/workspace-membership.guard';
 import { authBridgeMiddleware } from '@/shared/presentation/middlewares/auth-bridge.middleware';
+import { getUser } from '@/shared/utils/auth';
+import { WORKSPACE_QUERY_CONFIG, MEMBER_QUERY_CONFIG } from '@/shared/constants/query-configs';
+import { MongoWorkspaceMemberRepository } from '../infrastructure/repositories/mongo-workspace-member.repository';
 
 @ApiTags('Workspaces')
 @ApiBearerAuth()
@@ -25,14 +28,13 @@ import { authBridgeMiddleware } from '@/shared/presentation/middlewares/auth-bri
 @Controller()
 export class WorkspacesController {
   @Autowired() private createWorkspaceUseCase!: CreateWorkspaceUseCase;
-  @Autowired() private listWorkspacesUseCase!: ListWorkspacesUseCase;
   @Autowired() private updateWorkspaceUseCase!: UpdateWorkspaceUseCase;
   @Autowired() private deleteWorkspaceUseCase!: DeleteWorkspaceUseCase;
   @Autowired() private inviteMemberUseCase!: InviteMemberUseCase;
-  @Autowired() private listMembersUseCase!: ListMembersUseCase;
   @Autowired() private updateMemberRoleUseCase!: UpdateMemberRoleUseCase;
   @Autowired() private removeMemberUseCase!: RemoveMemberUseCase;
   @Autowired() private leaveWorkspaceUseCase!: LeaveWorkspaceUseCase;
+  @Autowired() private memberRepo!: MongoWorkspaceMemberRepository;
 
   @Post('/', { body: createWorkspaceSchema })
   @ApiOperation({ summary: 'Create a new workspace' })
@@ -40,19 +42,22 @@ export class WorkspacesController {
   @ApiResponse({ status: 400, description: 'Validation error' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async create(ctx: RequestContext) {
-    const user = ctx.get('user');
+    const user = getUser(ctx);
     const result = await this.createWorkspaceUseCase.execute(user.id, ctx.body);
     ctx.created(successResponse(result, 'Workspace created'));
   }
 
   @Get('/')
   @ApiOperation({ summary: 'List workspaces for the current user' })
-  @ApiResponse({ status: 200, description: 'List of workspaces' })
+  @ApiResponse({ status: 200, description: 'Paginated list of workspaces' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiQueryParams(WORKSPACE_QUERY_CONFIG)
   async list(ctx: RequestContext) {
-    const user = ctx.get('user');
-    const result = await this.listWorkspacesUseCase.execute(user.id);
-    ctx.json(successResponse(result));
+    const user = getUser(ctx);
+    await ctx.paginate(
+      (parsed) => this.memberRepo.findPaginatedForUser(parsed, user.id),
+      WORKSPACE_QUERY_CONFIG,
+    );
   }
 
   @Get('/:workspaceId', { params: z.object({ workspaceId: z.string() }) })
@@ -108,9 +113,12 @@ export class WorkspacesController {
   @ApiResponse({ status: 200, description: 'List of workspace members' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Not a member of this workspace' })
+  @ApiQueryParams(MEMBER_QUERY_CONFIG)
   async listMembers(ctx: RequestContext) {
-    const result = await this.listMembersUseCase.execute(ctx.params.workspaceId);
-    ctx.json(successResponse(result));
+    await ctx.paginate(
+      (parsed) => this.memberRepo.findPaginatedMembers(parsed, ctx.params.workspaceId),
+      MEMBER_QUERY_CONFIG,
+    );
   }
 
   @Patch('/:workspaceId/members/:userId', {
@@ -148,7 +156,7 @@ export class WorkspacesController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Not a member of this workspace' })
   async leave(ctx: RequestContext) {
-    const user = ctx.get('user');
+    const user = getUser(ctx);
     await this.leaveWorkspaceUseCase.execute(ctx.params.workspaceId, user.id);
     ctx.json(successResponse(null, 'Left workspace'));
   }

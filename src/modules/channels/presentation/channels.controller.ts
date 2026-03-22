@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Delete, Middleware, Autowired } from '@forinda/kickjs-core';
+import { Controller, Get, Post, Patch, Delete, Middleware, Autowired, ApiQueryParams } from '@forinda/kickjs-core';
 import type { RequestContext } from '@forinda/kickjs-http';
 import { HttpException } from '@forinda/kickjs-core';
 import { z } from 'zod';
@@ -10,6 +10,7 @@ import { workspaceMembershipGuard } from '@/shared/guards/workspace-membership.g
 import { channelMembershipGuard } from '@/shared/guards/channel-membership.guard';
 import { MongoChannelRepository } from '../infrastructure/repositories/mongo-channel.repository';
 import { authBridgeMiddleware } from '@/shared/presentation/middlewares/auth-bridge.middleware';
+import { CHANNEL_QUERY_CONFIG } from '@/shared/constants/query-configs';
 
 @ApiTags('Channels')
 @ApiBearerAuth()
@@ -46,9 +47,12 @@ export class ChannelsController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @Get('/workspaces/:workspaceId/channels', { params: z.object({ workspaceId: z.string() }) })
   @Middleware(workspaceMembershipGuard)
+  @ApiQueryParams(CHANNEL_QUERY_CONFIG)
   async list(ctx: RequestContext) {
-    const channels = await this.channelRepo.findByWorkspace(ctx.params.workspaceId);
-    ctx.json(successResponse(channels));
+    await ctx.paginate(
+      (parsed) => this.channelRepo.findPaginated(parsed, { workspaceId: ctx.params.workspaceId }),
+      CHANNEL_QUERY_CONFIG,
+    );
   }
 
   @ApiOperation({ summary: 'Get a single channel by ID' })

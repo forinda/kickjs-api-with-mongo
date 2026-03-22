@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Delete, Middleware, Autowired } from '@forinda/kickjs-core';
+import { Controller, Get, Post, Patch, Delete, Middleware, Autowired, ApiQueryParams } from '@forinda/kickjs-core';
 import type { RequestContext } from '@forinda/kickjs-http';
 import { z } from 'zod';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@forinda/kickjs-swagger';
@@ -11,15 +11,20 @@ import { GetBoardViewUseCase } from '../application/use-cases/get-board-view.use
 import { successResponse } from '@/shared/application/api-response.dto';
 import { workspaceMembershipGuard } from '@/shared/guards/workspace-membership.guard';
 import { projectAccessGuard } from '@/shared/guards/project-access.guard';
+import { PROJECT_QUERY_CONFIG } from '@/shared/constants/query-configs';
+import { MongoProjectRepository } from '../infrastructure/repositories/mongo-project.repository';
+import { authBridgeMiddleware } from '@/shared/presentation/middlewares/auth-bridge.middleware';
 
 @ApiTags('Projects')
 @ApiBearerAuth()
+@Middleware(authBridgeMiddleware)
 @Controller()
 export class ProjectsController {
   @Autowired() private createProjectUseCase!: CreateProjectUseCase;
   @Autowired() private updateProjectUseCase!: UpdateProjectUseCase;
   @Autowired() private listProjectsUseCase!: ListProjectsUseCase;
   @Autowired() private getBoardViewUseCase!: GetBoardViewUseCase;
+  @Autowired() private projectRepo!: MongoProjectRepository;
 
   @Post('/workspaces/:workspaceId/projects', {
     params: z.object({ workspaceId: z.string() }),
@@ -41,9 +46,12 @@ export class ProjectsController {
   @ApiResponse({ status: 200, description: 'List of projects returned successfully' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden - not a workspace member' })
+  @ApiQueryParams(PROJECT_QUERY_CONFIG)
   async list(ctx: RequestContext) {
-    const result = await this.listProjectsUseCase.execute(ctx.params.workspaceId);
-    ctx.json(successResponse(result));
+    await ctx.paginate(
+      (parsed) => this.projectRepo.findPaginated(parsed, { workspaceId: ctx.params.workspaceId, isArchived: false }),
+      PROJECT_QUERY_CONFIG,
+    );
   }
 
   @Get('/projects/:projectId', { params: z.object({ projectId: z.string() }) })

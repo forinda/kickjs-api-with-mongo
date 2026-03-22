@@ -35,7 +35,7 @@ Each issue file maps to the GitHub issue templates at [kick-js/.github/ISSUE_TEM
 | ID | Title | Package | Type | Status |
 |---|---|---|---|---|
 | [KICK-015](./KICK-015.md) | `kick readme` CLI command | cli | New CLI command | Open |
-| [KICK-017](./KICK-017.md) | `@Service()` classes should be auto-registered in DI container | core, queue | Enhancement | Released (partial) |
+| [KICK-017](./KICK-017.md) | `@Service()` classes should be auto-registered in DI container | core, queue | Enhancement | Released |
 | [KICK-018](./KICK-018.md) | Type-safe API client generation (tRPC-like) | cli, http, swagger | New feature | Open |
 
 ## Statuses
